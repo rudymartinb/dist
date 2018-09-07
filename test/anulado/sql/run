@@ -1,0 +1,1 @@
+clear ; mysql --socket=/mydata/socks/mysql_develop.sock -uroot -psunpei42 dist --disable-pager --batch --silent --skip-column-names --unbuffered < $1

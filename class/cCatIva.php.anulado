@@ -1,0 +1,15 @@
+<?php
+/* esta clase es un elemento 
+** que forma parte de cReporteProduccion
+*/
+
+require_once( "config.php" );
+require_once( $DIST.$CLASS."/cBasica.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+
+class cCatIVA extends cBasica  {
+	public $db;
+	function GrabarAlta(){
+	}
+}

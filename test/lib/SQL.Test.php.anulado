@@ -1,0 +1,47 @@
+<?php
+
+require( "config.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+error_reporting(E_ALL);
+
+class testajaxCategoriaGrabarAlta extends PHPUnit_Framework_TestCase {
+
+	public function testSQL_EsValido(){
+		$db = null;
+		
+		/* SQL_EsValido()
+		*/
+		$this->assertFalse( SQL_EsValido( $db ) );
+		$db = SQL_Conexion();
+		$this->assertTrue( SQL_EsValido( $db ) );
+	}
+
+	
+	public function test_Row_Count(){
+		$db = SQL_Conexion();
+		$this->assertEquals( -1, QueryRecCount( $db, "" ), "QueryRecCount Fallo" );
+	}
+	
+	
+	public function test_QueryRecCount(){
+		$db = SQL_Conexion();
+		
+		/* funcion pensada para mayormente para unit tests
+		*/
+		$this->assertEquals( 1, QueryRecCount( $db, "select 1" ), "QueryRecCount Fallo" );
+		$this->assertEquals( 0, QueryRecCount( $db, "set @nada := null;" ), "QueryRecCount Fallo" );
+		// rever que hacer con esto !
+		
+		// $this->assertEquals( 0, QueryRecCount( $db, "call test.dummy();" ), "QueryRecCount Fallo Call Dummy" );
+		// $this->assertEquals( 1, QueryRecCount( $db, "call test.dummyselect();" ), "QueryRecCount Fallo Call Dummy" );
+		// $this->assertEquals( 1, QueryRecCount( $db, "call test.dummyselectfalse();" ), "QueryRecCount Fallo Call Dummy" );
+		
+		
+		
+
+		
+	}
+	
+}
+
+?>

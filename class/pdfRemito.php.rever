@@ -1,0 +1,149 @@
+<?php
+require_once( "config.php" );
+require_once( $DIST.$LIB."/fpdf/fpdf.php" );
+
+class PDFRemito extends FPDF
+{
+	public $db;
+	public $nro; 
+	public $fecha; 
+	public $codcli; 
+	public $razcli; 
+	public $domcli; 
+	public $loccli; 
+	public $datos; 
+	
+	// Cabecera de página
+	function Header()
+	{
+		// Logo
+		// $this->Image('logo_pb.png',10,8,33);
+		// Arial bold 15
+		
+		// Movernos a la derecha
+		// $this->Cell(1);
+		  $this->Ln(1);
+		// Título
+		$this->SetFont('Courier','B',15);
+		$this->Cell(90,10,'DIARIO EL POPULAR',"LT",0,'C');
+		$this->SetFont('Courier','B',20);
+		$this->Cell(10,10,'X',"LTRB",0,'C');
+		
+		$this->Cell(90,10,'',"TR",0,'C');
+		// $this->SetY(20);
+		  $this->Ln(10);
+		$this->Cell(95,10,'',"RLB",0,'L');
+		$this->Cell(95,10,'',"RLB",0,'L');
+
+		$this->SetFont('Courier','B',9);
+		$this->SetY(13);
+		$this->SetX(129);
+		$this->Cell(90,10,'REMITO: '.$this->nro);
+
+		$this->SetY(18);
+		$this->SetX(129);
+		$this->Cell(90,10,'FECHA: '.$this->fecha);
+
+		$this->SetY(35);
+		$this->SetX(10);
+		$this->Cell(0,0,'CLIENTE: '.$this->razcli.' ('.$this->codcli.')');
+
+		$this->SetY(40);
+		$this->SetX(10);
+		$this->Cell(0,0,'DOMICILIO: '.$this->domcli);
+
+		$this->SetY(45);
+		$this->SetX(10);
+		$this->Cell(0,0,'LOCALIDAD: '.$this->loccli);
+
+		$this->SetY(55);
+		$this->SetX(10);
+		$this->Cell(0,0,'CANTIDAD');
+		$this->SetX(30);
+		$this->Cell(0,0,'PRODUCTO');
+		
+		// $this->Cell(180,30,'Title',1,0,'C');
+		// Salto de línea
+		$this->Ln(5);
+	}
+
+	// Pie de página
+	function Footer()
+	{
+		// Posición: a 1,5 cm del final
+		// $this->SetY(-15);
+		// Arial italic 8
+		// $this->SetFont('Arial','I',8);
+		// Número de página
+		// $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+	}
+	function ImprimirDatosRemito() {
+		$this->SetFont('Courier','',10);
+		// for($i=0;$i<count($this->datos);$i++)
+		foreach($this->datos as $key => $value)
+			$cant = $value[0];
+			$cod = $value[1];
+			$des = $value[2];
+			$this->SetX(10);
+			$this->Cell(0,5,$cant);
+			$this->SetX(30);
+			$this->Cell(0,5,$cod);
+			$this->SetX(40);
+			$this->Cell(0,5,$des);
+	}
+
+	function Generar( ){
+
+		$this->AliasNbPages();
+		$this->AddPage();
+		$this->ImprimirDatosRemito();
+		$this->Output();
+	}
+	function LeerRemito( $idx ){
+		$q = "call sp_remitos_leeridx( ".$idx." );";
+		$res = $this->db->query( $q );
+		$lista = [];
+		if( $res ){
+			while( $row = $res->fetch_assoc() ){
+				$lista[] = $row;
+			}
+		}
+		while( $this->db->more_results() ){
+			$this->db->next_result();
+		}		
+		$res->close();
+		
+		$this->nro = $lista[0]['nrorem1'];
+		$this->fecha = $lista[0]['fecrem1'];
+		$this->codcli = $lista[0]['clirem1'];
+		$this->razcli = $lista[0]['razcli'];
+		$this->domcli = $lista[0]['domcli'];
+		$this->loccli = $lista[0]['loccli'];
+		
+		$this->datos = array();
+
+		$q = "call sp_remito2_leeridx( ".$idx." );";
+		$res = $this->db->query( $q );
+		$items = [];
+		if( $res ){
+			while( $row = $res->fetch_assoc() ){
+				$arr = [];
+				// var_dump( $row );
+				$arr[] = $row['canrem'];
+				$arr[] = $row['prorem'];
+				$arr[] = $row['despro'] ;
+				$this->datos[] = $arr ;
+				$items[] = $row;
+			}
+			while( $this->db->more_results() ){
+				$this->db->next_result();
+			}		
+			$res->close();
+		}
+		
+		
+		return true;
+	}
+
+}
+?>

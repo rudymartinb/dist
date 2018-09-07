@@ -1,0 +1,365 @@
+<?php
+
+/* 
+ * 20171111
+ * 
+ * todas estas pruebas tienen un problema: 
+ * no ejecutan validaciones puntuales que demuestren lo que sucede
+ * (aunque sirven como para demostrar que la API funciona
+ * cosa que con MariaDB salto enseguida la diferencia respecto de MySQL)
+ * 
+ * --- anterior:
+lo que tengo q probar
+la clase mysqli a ver como funciona
+
+hacer pruebas reales contra un server real
+* 
+* funciona contra un catalogo testing !!!
+* 
+*/
+error_reporting(E_ALL);
+
+class MySQLi_Test extends PHPUnit_Framework_TestCase {
+
+	/* prueba de select directo sin tabla alguna
+	*/
+	public function test1SelectOK(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("SELECT 'sarasa estuvo aqui' as uno");
+		
+		if( $res ){
+			$row = $res->fetch_assoc();
+		}
+		$this->assertEquals( $row['uno'] , "sarasa estuvo aqui" );
+		$this->assertEquals( false, $mysqli->more_results() );
+		$res->close();
+		$mysqli->close();
+		
+	}
+	
+	public function test1SelectError(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("SELECT * from sarasa");
+		$this->assertEquals( false , $res );
+		$this->assertEquals( $mysqli->error, "Table 'testing.sarasa' doesn't exist" );
+		$this->assertEquals( false, $mysqli->more_results() );
+		
+		// $res->close();
+		$mysqli->close();
+	}
+	
+	public function test1SelectVacio(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("SELECT * from tabla1 where false");
+		$this->assertNotEquals( false , $res );
+		$row = $res->fetch_assoc();
+		$this->assertTrue( $row === null  );
+		$this->assertEquals( false, $mysqli->more_results() );
+		$res->close();
+		$mysqli->close();
+		// $this->assertEquals( $row['sarasa'] , "sarasa estuvo aqui" );		
+	}	
+	
+	public function test1InsertOK(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("start transaction;");
+		$this->assertNotEquals( false , $res );
+		
+		$res = $mysqli->query("insert into tabla1 set sarasa = 'queseyo'");
+		$this->assertNotEquals( false , $res );
+		
+		$res = $mysqli->query("rollback;");
+		$this->assertNotEquals( false , $res );		
+		
+		$mysqli->close();		
+	}
+	
+	public function test1InsertFalla(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("insert into tabla1 set sarasa = null");
+		$this->assertEquals( false , $res );
+	}
+
+	public function test1InsertError(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("insert into tabla2 set sarasa = null");
+		$this->assertEquals( false , $res );
+	}	
+	
+	
+	public function test1UpdateOK(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("start transaction;");
+		$this->assertNotEquals( false , $res );
+		
+		$res = $mysqli->query("update tabla1 set sarasa = 'queseyo' where true");
+		$this->assertNotEquals( false , $res );
+		
+		$res = $mysqli->query("rollback;");
+		$this->assertNotEquals( false , $res );			
+	}
+
+	
+	/* update con null en columna q no admite nulls
+	 * 
+	 * MariaDB no da error !!! 
+	 * pero al actualizar un campo a NULL te lo pone en '' o 0 segun corresponda
+	 * 
+	*/
+	public function test1UpdateFalla(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("start transaction;");
+		$this->assertNotEquals( false , $res );
+
+		$res = $mysqli->query("insert into tabla1 set sarasa = 'queseyo', numero = 667");
+		$this->assertNotEquals( false , $res );
+		
+		$res = $mysqli->query("update tabla1 set sarasa = null, numero = null");
+		$this->assertEquals( true , $res );
+		
+		$res = $mysqli->query("show warnings;");
+		$lista = $res->fetch_all( MYSQLI_ASSOC );
+		// var_dump( $lista );
+		
+		
+		$res = $mysqli->query("select * from tabla1;");
+		$lista = $res->fetch_all( MYSQLI_ASSOC );
+		// var_dump( $lista );
+		
+
+		$res = $mysqli->query("update tabla1 set numero = 'a'");
+		$this->assertEquals( true , $res );
+		
+		$res = $mysqli->query("show warnings;");
+		$lista = $res->fetch_all( MYSQLI_ASSOC );
+		// var_dump( $lista );		
+		
+		$res = $mysqli->query("rollback;");
+		$this->assertNotEquals( false , $res );			
+	}
+	
+	
+	/* sp_1select
+	*/
+	public function testSP1SelectOK(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		/* tuve que sacar la llamda a Query y reempalzarlo por multiquery para lo que sigue luego
+		*/
+		// $res = $mysqli->query("call sp_1select;");
+		// $this->assertNotEquals( false , $res );
+
+		$ok = $mysqli->multi_query("call sp_1select;");
+		$this->assertTrue( $ok, $mysqli->error );
+		
+		//  obtener primera consulta
+		$res = $mysqli->store_result();
+		$this->assertNotEquals( false, $res ) ;
+		
+		
+		$row = $res->fetch_assoc();
+		$this->assertEquals( $row['uno'] , 1 );		
+		$row = $res->fetch_assoc();
+		$this->assertNull( $row );
+		$this->assertEquals( false , $row );
+		$res->close();
+		
+		/* es 1 solo select pero esto devuelve true
+		*/
+		$this->assertEquals( true, $mysqli->more_results() );
+		$this->assertEquals( true , $mysqli->next_result() );
+		
+		/* de que manera obtengo el "resultado" para saber que no hay nada ?
+		*/
+		$ok = $mysqli->store_result();
+		$this->assertFalse( $ok ) ; // nada !
+		
+		$this->assertEquals( false, $mysqli->more_results() );
+		
+		// $this->assertEquals( false , $mysqli->more_results() );
+		
+	}
+	
+	/* SP que devuelve dos selects
+	*/
+	public function testSP2SelectOK(){
+	
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		// SP que devuelve dos selects
+		$ok = $mysqli->multi_query("call sp_2selects;");
+		$this->assertTrue( $ok, $mysqli->error );
+		
+		//  obtener primera consulta
+		$res = $mysqli->store_result();
+		$this->assertNotEquals( false, $res ) ;
+
+		// primer renglon
+		$row = $res->fetch_assoc();
+		$this->assertEquals( $row['uno'] , 1 );
+		
+		// segundo renglon devuelve null
+		$row = $res->fetch_assoc();
+		$this->assertTrue( $row === null  );
+		$res->close();
+		
+		// pasamos a la proxima
+		$this->assertEquals( true , $mysqli->more_results() );
+		$this->assertEquals( true , $mysqli->next_result() );
+
+		// obtener result
+		$res = $mysqli->store_result();
+		
+		// obtener primer renglon
+		$row = $res->fetch_assoc();
+		$this->assertEquals( $row['dos'] , 2 );				
+		
+		// obtener segundo renglon, devuelve null
+		$row = $res->fetch_assoc();
+		$this->assertTrue( $row === null  );
+		$res->close();
+		
+		// pasar a la proxima inexistente. inexplicablemente devuelve true
+		$this->assertEquals( true, $mysqli->more_results() );
+		$this->assertEquals( true, $mysqli->next_result() );
+		
+		// a ver que sigue?
+		$ok = $mysqli->store_result();
+		$this->assertFalse( $ok ) ; // nada !
+		
+		$this->assertEquals( false, $mysqli->more_results() );
+		
+		
+	}	
+	
+	/* SP que hace un select de una talba que existe pero la consulta viene vacia
+	*/
+	public function testSP1SelectFalla(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+		$ok = $mysqli->multi_query("call sp_selectfalla;");
+		$this->assertTrue( $ok, $mysqli->error );
+
+		// $ok = $mysqli->multi_query("call sp_selectfalla;");
+		// $this->assertTrue( $ok, $mysqli->error );
+		
+		//  obtener primera consulta
+		$res = $mysqli->store_result();
+		$this->assertNotEquals( false, $res ) ;
+
+		// verificamos que en realidad no se devolvio nada de nada
+		$this->assertEquals( true, $mysqli->more_results() ); 
+
+		// pedimos renglon y viene NULL
+		$row = $res->fetch_assoc();
+		$this->assertNull( $row );		
+		$this->assertEquals( false , $row );
+		
+		// pedimos el siguiente y devuelve FALSE
+		$row = $res->fetch_assoc();
+		$this->assertEquals( false , $row );
+		$this->assertEquals( true, $mysqli->more_results() ); 
+		$res->close();
+		
+		// sigue devolviendo TRUE
+		$this->assertEquals( true, $mysqli->more_results() );
+		$this->assertEquals( true, $mysqli->next_result() );
+		
+		$this->assertEquals( false, $mysqli->more_results() );
+		
+		// ok, a ver que sigue?
+		$ok = $mysqli->store_result();
+		$this->assertFalse( $ok ) ; // nada !
+		
+		//
+		$this->assertEquals( false, $mysqli->more_results() );
+
+	}
+	
+	/* SP hace un select de una tabla 'testing.sarasa' inexistente
+	*/
+	public function testSP1SelectError(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("call sp_selecterror;");
+		$this->assertFalse( $res );
+		$this->assertEquals( $mysqli->error, "Table 'testing.sarasa' doesn't exist" );
+		
+		$this->assertEquals( false, $mysqli->more_results() );
+		
+		/* nada mas que hacer.
+		*/
+
+	}	
+	
+	public function testSPVacio(){
+		$mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("call sp_vacio;");
+		$this->assertTrue( $res );
+		$this->assertEquals( false, $mysqli->more_results() );
+		
+		
+	}	
+	
+}
+?>

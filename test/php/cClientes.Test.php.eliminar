@@ -1,0 +1,43 @@
+<?php
+require( "config.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$CLASS.$DEMO."/cClientesDemo.php" );
+
+
+class cClienteTest extends PHPUnit_Framework_TestCase {
+	public function test1(){
+		$db = SQL_Conexion();
+		
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+		}
+		if( $res === FALSE ) {
+			$error = "Error: ". $db->error ;
+			echo  $error;
+		}
+
+		$cli = new cClientesDemo();
+		$cli->db = $db;
+		$cli->Setup( true );
+		$this->assertTrue( $cli->GrabarAlta(), "GrabarAlta" ) ;
+
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+		}
+		if( $res === FALSE ) {
+			$error = "Error: ". $db->error ;
+			echo  $error;
+		}
+
+	}
+}
+
+?>

@@ -1,0 +1,1 @@
+echo "clear ; phpunit.phar $1 || exit 1">>run

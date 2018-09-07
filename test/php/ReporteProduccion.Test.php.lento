@@ -1,0 +1,397 @@
+<?php
+// TODO ESTO HABRIA QUE CAMBIARLO POR MOCKS DE MYSQLI
+
+require( "config.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+require_once( $DIST.$LIB."/PadN.php" );
+
+
+
+// include_once( $DIST.$CLASS."/demo/cClientesGrupoDemo.php" );
+require_once( $DIST.$CLASS."/demo/cClientesGruposDemo.php" );
+require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
+require_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
+require_once( $DIST.$CLASS."/cReporteEntrega.php" );
+require_once( $DIST.$CLASS."/cReporteProduccion.php" );
+require_once( $DIST.$CLASS."/cReporteTirada.php" );
+require_once( $DIST."/ArmarTiradaDiaria.php" );
+
+include_once( $DIST."/ProcesarReporteProduccion.php" );
+
+error_reporting(E_ALL);
+
+class testReporteProduccion extends PHPUnit\Framework\TestCase {
+	
+	public function testSimulacion(){
+		$db = SQL_Conexion_Demo();
+
+
+		
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+		}
+		if( $res === FALSE ) {
+			$error = "Error: ". $db->error ;
+			echo  $error;
+		}
+		
+		$q = "call dev_crema;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return false;
+		}
+		if( $res === FALSE ) {
+			$error = "Error: ". $db->error ;
+			echo  $error;
+			return false;
+		}
+		
+		$this->assertEquals( 0, QueryRecCount( $db, "select * from productos" ), "QueryRecCount productos" );
+		
+		
+		/* 
+		okay. ahora me falta generar productos.
+		por ahora usamos uno solo. 
+		depsues vemos.
+		*/
+		$prod = new cProducto();
+		$prod->db = $db;
+
+		$cod = "001" ;
+		$des = "DIARIO LUNES" ;
+		$abr = "E.LUNES" ;
+		$lun = true ;
+		$mar = false ;
+		$mie = false ;
+		$jue = false ;
+		$vie = false ;
+		$sab = false ;
+		$dom = false ;
+		$precio = 5 ;
+		$controlpapelusado = true ;
+
+		$prod->cod = $cod ;
+		$prod->des = $des ;
+		$prod->abr = $abr ;
+		$prod->lun = $lun ;
+		$prod->mar = $mar ;
+		$prod->mie = $mie ;
+		$prod->jue = $jue ;
+		$prod->vie = $vie ;
+		$prod->sab = $sab ;
+		$prod->dom = $dom ;
+		$prod->automatico = true;
+		$prod->precio = $precio ;
+		$prod->controlpapelusado = $controlpapelusado ;
+
+		$this->assertTrue( $prod->GrabarAlta( ), "Producto GrabarAlta ". $prod->DetalleError );
+
+		/* 
+		okay. ahora me falta generar productos.
+		por ahora usamos uno solo. 
+		depsues vemos.
+		*/
+		$prod = new cProducto();
+		$prod->db = $db;
+
+		$cod = "002" ;
+		$des = "OTRO PRODUCTO" ;
+		$abr = "OTRO" ;
+		$lun = true ;
+		$mar = false ;
+		$mie = false ;
+		$jue = false ;
+		$vie = false ;
+		$sab = false ;
+		$dom = false ;
+		$precio = 5 ;
+		$precio1 = 10 ;
+		$precio2 = 11;
+		$precio3 = 12 ;
+		$precio4 = 13;
+		$precio5 = 14;
+		$precio6 = 15 ;
+		$precio7 = 16;
+		$controlpapelusado = true ;
+
+		$prod->cod = $cod ;
+		$prod->des = $des ;
+		$prod->abr = $abr ;
+		$prod->lun = $lun ;
+		$prod->mar = $mar ;
+		$prod->mie = $mie ;
+		$prod->jue = $jue ;
+		$prod->vie = $vie ;
+		$prod->sab = $sab ;
+		$prod->dom = $dom ;
+		$prod->automatico = true;
+		$prod->precio = $precio ;
+		$prod->precio1 = $precio1 ;
+		$prod->precio2 = $precio2 ;
+		$prod->precio3 = $precio3 ;
+		$prod->precio4 = $precio4 ;
+		$prod->precio5 = $precio5 ;
+		$prod->precio6 = $precio6 ;
+		$prod->precio7 = $precio7 ;
+		$prod->controlpapelusado = $controlpapelusado ;
+
+		$this->assertTrue( $prod->GrabarAlta( ), "Producto GrabarAlta ". $prod->DetalleError );
+				
+		/* 
+		okay.
+		ahora quiero, para cada uno de los clientes generados,
+		asignar cantidades para un dia determinado.
+		
+		todo esto lo hacemos sobre un dia X
+		*/
+		$codcli = 1;
+		$fecha = "06-06-2014";
+		
+	
+		/* 
+		hastsa aqui fue solamente una copia de otro test.
+		despues vere de juntarlos en uno solo.
+		dos temas pendientes:
+		1) el armado del php
+		lleva un form en el cual se piden todos los datos
+		que lleva la clase cReporteProduccion
+		con el adicional de subformularios adicionales 
+		que son todos iguales iguales: cReporteTirada
+		
+		*/
+		
+		$rp = new cReporteProduccion();
+		$rp->db = $db;
+		$rp->TestMode = true;
+		$rp->fecha = $fecha;
+		$rp->TotalKgrs = 1000;
+		$rp->TotalKgrsCapaBlanca = 1000;
+		$rp->Observaciones = "ninguna";
+		$rp->pro = "001";
+		$rp->TiradaNeta = 128;
+		
+		$rt = new cReporteTirada();
+		$rt->db = $db;
+		$rt->nro = 1;
+		$rt->horaini = "01:00";
+		$rt->horafin = "02:00";
+		$rt->MaqIni = 123;
+		$rt->MaqFin = 124;
+		$rt->TiradaBruta = 125;
+		$rt->Carga = 126;
+		$rt->Desperdicios = 127;
+		
+		$rt->Kgrs = 129;
+		$rt->pagtotal = 130;
+		$rt->pagcolor = 100;
+		$rt->idxrep = 1;
+		
+		$this->assertTrue( $rt->EsValido(), "RT Valido ".$rt->DetalleError );
+		$this->assertTrue( $rp->AgregarTirada( $rt ), "AgregarTirada" );
+	
+		$this->assertEquals( 1, count( $rp->tiradas ), "cantidad tiradas " );
+		
+		$this->assertTrue( $rp->GrabarAlta( ), "Reporte Produccion GrabarAlta ". $rp->DetalleError );
+		
+		$idx = $rp->idx;
+
+		$this->assertTrue( $idx > 0, "idx " );
+		
+		$this->assertEquals( 1, QueryRecCount( $db, "select * from reporteproduccion1" ), "QueryRecCount reporteproduccion1" );
+		$this->assertEquals( 1, QueryRecCount( $db, "select * from reporteproduccion2" ), "QueryRecCount reporteproduccion2" );
+		
+		$rp->ClearAll();
+		$rp->idx = (int) $idx;
+		$this->assertTrue( $rp->idx > 0, "idx " );
+		$this->assertTrue( $rp->LeerIdx( ), "LeerIdx ". $rp->DetalleError );
+		$this->assertEquals( 1000, $rp->TotalKgrs , "cantidad tiradas " );
+		$this->assertEquals( $fecha, $rp->fecha , "cantidad tiradas " );
+
+		$this->assertEquals( 1, count( $rp->tiradas ), "" );
+		$this->assertEquals( "001", $rp->pro , "productos" );
+		
+		$this->assertEquals( "01:00", $rp->tiradas[0]->horaini , "reporte tiradas 0" );
+		$this->assertEquals( "02:00", $rp->tiradas[0]->horafin , "reporte tiradas 0" );
+		$this->assertEquals( 123, $rp->tiradas[0]->MaqIni , "reporte tiradas 0" );
+		$this->assertEquals( 124, $rp->tiradas[0]->MaqFin , "reporte tiradas 0" );
+		$this->assertEquals( 125, $rp->tiradas[0]->TiradaBruta , "reporte tiradas 0 TiradaBruta" );
+		$this->assertEquals( 126, $rp->tiradas[0]->Carga , "reporte tiradas 0 TiradaBruta" );
+		$this->assertEquals( 127, $rp->tiradas[0]->Desperdicios , "reporte tiradas 0 TiradaBruta" );
+		// $this->assertEquals( 128, $rp->tiradas[0]->TiradaNeta , "reporte tiradas 0 TiradaBruta" );
+		$this->assertEquals( 129, $rp->tiradas[0]->Kgrs , "reporte tiradas 0 TiradaBruta" );
+		$this->assertEquals( 130, $rp->tiradas[0]->pagtotal , "reporte tiradas 0 TiradaBruta" );
+		$this->assertEquals( 100, $rp->tiradas[0]->pagcolor , "reporte tiradas 0 TiradaBruta" );
+
+		/* 
+		al final todo esto queda como un test de aceptacion
+		ahora que ya esta el reporte generado 
+		quiero saber si ya esta generada la informacion def facturacion
+		*/
+		// $this->assertEquals( 1, QueryRecCount( $db, "select * from reporteproduccion1" ), "Reporte para Facturacion" );
+		
+		/* reporte de entrega de materiales
+		*/
+		// $re = new cReporteEntrega();
+		// $this->assertEquals( false, $re->Valido() , "Agregar Reporte Entrega Valido" );		
+		// $re->db = $db;
+		// $re->TestMode = true;
+		// $re->fecha = $fecha;
+		// $re->pro = $cod; // cod producto
+		
+		// $this->assertEquals( true, $re->Agregar( "001", 100, 10 ) , "Agregar Reporte Entrega Cliente" );		
+		// $this->assertEquals( 1, count( $re->rec ) , "Agregar Reporte Entrega Cliente" );		
+		// $this->assertEquals( true, $re->Valido() , "Agregar Reporte Entrega Valido" );		
+		// $this->assertEquals( true, $re->GrabarAlta() , "Agregar Reporte Entrega GrabarAlta: ".$re->DetalleError );		
+		// $this->assertEquals( true, $re->idx > 0 , "Agregar Reporte Entrega GrabarAlta: ".$re->DetalleError );		
+		
+		// $this->assertEquals( 1, QueryRecCount( $db, "select * from reporteentrega1" ), "Reporte para Facturacion reporteentrega1" );		
+		// $this->assertEquals( 1, QueryRecCount( $db, "select * from reporteentrega2" ), "Reporte para Facturacion reporteentrega2" );		
+		
+		
+		
+
+		
+		
+			
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+		}
+		if( $res === FALSE ) {
+			$error = "Error: ". $db->error ;
+			echo  $error;
+		}
+		
+	}
+
+	
+}
+
+function DiaModi1( $db, $fec, $cli, $prod, $cant ){
+	if( ! SQL_EsValido( $db ) ){
+		return false;
+	}
+	$fecha = fecha2SQL( $fec ) ;
+
+	// if( $tipo == "t1" ){
+		$q = "call sp_AgendaActualizarCant1(";
+	// } else {
+		// $q = "call sp_AgendaActualizarCant2(";
+	// }
+	$q .= "'". $cli ."'," ;
+	$q .= "'". $prod ."'," ;
+	$q .= "'". $fecha ."'," ;
+	$q .= "'". $cant ."')" ;
+	
+	try {
+		$res = $db->query( $q );
+	} catch ( Exception $e ) {
+		$DetalleError = $e->getMessage() ;
+		echo $DetalleError;
+		return false;
+	}
+	if( $res === FALSE ) {
+		$DetalleError = "Error : ". $db->error ;
+		echo $DetalleError;
+		return false;
+	}
+	
+	$q = "call dev_last_result()";
+	try {
+		$res = $db->query( $q );
+	} catch ( Exception $e ) {
+		$DetalleError = $e->getMessage() ;
+		echo $DetalleError;
+		return false;
+	}
+	if( $res === FALSE ) {
+		$DetalleError = "Error: ". $db->error ;
+		echo $DetalleError;
+		return false;
+	}
+	$result = false;
+	if( $res ) {
+		while( $obj = $res->fetch_object() ){
+			// echo gettype( $obj->result );
+			if( $obj->result == 1 ){
+				$result = true ;
+			}
+		}
+		while ( $db->more_results() ){
+			$db->next_result();
+		}
+	}	
+	
+	return $result;
+}
+
+function DiaModi2( $db, $fec, $cli, $prod, $cant ){
+	if( ! SQL_EsValido( $db ) ){
+		return false;
+	}
+	
+	$fecha = fecha2SQL( $fec ) ;
+
+	// if( $tipo == "t1" ){
+		// $q = "call sp_AgendaActualizarCant1(";
+	// } else {
+		$q = "call sp_AgendaActualizarCant2(";
+	// }
+	$q .= "'". $cli ."'," ;
+	$q .= "'". $prod ."'," ;
+	$q .= "'". $fecha ."'," ;
+	$q .= "'". $cant ."')" ;
+	
+	try {
+		$res = $db->query( $q );
+	} catch ( Exception $e ) {
+		$DetalleError = $e->getMessage() ;
+		echo $DetalleError;
+		return false;
+	}
+	if( $res === FALSE ) {
+		$DetalleError = "Error : ". $db->error ;
+		echo $DetalleError;
+		return false;
+	}
+	
+	$q = "call dev_last_result()";
+	try {
+		$res = $db->query( $q );
+	} catch ( Exception $e ) {
+		$DetalleError = $e->getMessage() ;
+		echo $DetalleError;
+		return false;
+	}
+	if( $res === FALSE ) {
+		$DetalleError = "Error: ". $db->error ;
+		echo $DetalleError;
+		return false;
+	}
+	$result = false;
+	if( $res ) {
+		while( $obj = $res->fetch_object() ){
+			// echo gettype( $obj->result );
+			if( $obj->result == 1 ){
+				$result = true ;
+			}
+		}
+		while ( $db->more_results() ){
+			$db->next_result();
+		}
+	}	
+	
+	return $result;
+}	
+?>

@@ -1,0 +1,96 @@
+<?php
+
+require( "config.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+require_once( $DIST."/informes/mensual/infomensual_validar.php" );
+
+error_reporting(E_ALL);
+
+class testReporteMensual extends PHPUnit_Framework_TestCase {
+	/* pruebas que pueden fallar por cuanto dependen de un SQL
+	** con catalogo y tablas
+	*/
+	public function testPost(){
+		$db = SQL_Conexion_Demo();
+		$prod = '001';
+		$desde = '01-11-2014';
+		$hasta = '30-11-2014';
+		
+		$post = [];
+		$post['codprod'] = $prod;
+		$post['desde'] = $desde;
+		$post['hasta'] = $hasta;
+		$lista = InfoMenusualPost( $db, $post );
+		$this->assertEquals( "array", gettype( $lista )   );
+	}
+	public function testValidarPost(){
+		$db = SQL_Conexion_Demo();
+		$prod = '001';
+		$desde = '01-11-2014';
+		$hasta = '30-11-2014';
+		
+		$post = [];
+		$post['codprod'] = $prod;
+		$post['desde'] = $desde;
+		$post['hasta'] = $hasta;
+		$this->assertEquals( true, InfoMenusualValidarPost( $post ) );
+	}
+		
+	/*
+	el problema con esta prueba es que el SP que es llamado
+	contiene una transsaccion
+	por ende habria que hacer dos cambios
+	1) usar un alcahuete TestMode en el php para activar transaccion
+	2) generar un SP hermano que no use transaccion,
+	pero que tenga exactamente el mismo codigo que el productivo
+	*/
+	public function testInicio(){
+		$db = SQL_Conexion_Demo();
+		
+	
+		$prod = '001';
+		$desde = '01-11-2014';
+		$hasta = '30-11-2014';
+		
+		$lista = GenerarReporteMensual( $db, $prod, $desde, $hasta );
+
+		$this->assertEquals( true, count( $lista ) > 0, "count lista" );
+		
+		// dia, vtaciu, vtaint, susciu, devsin, devciu, devint, nodis, cirneta, inutilizable,
+		// tirbruta, paginas, totpaginas, kgrstotales, dow, susint
+		$this->assertEquals( true, isset( $lista[0]['dia'] ) , "count lista" );
+		$this->assertEquals( true, isset( $lista[0]['vtaciu'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['vtaint'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['susciu'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['susint'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['devsin'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['devciu'] ) , "" );
+		// $this->assertEquals( true, isset( $lista[0]['devint'] ) , "count lista" );
+		$this->assertEquals( true, isset( $lista[0]['nodis'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['cirneta'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['inutilizable'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['tirneta'] ) , "tirada neta" );
+		$this->assertEquals( true, isset( $lista[0]['tirbruta'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['paginas'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['totpaginas'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['kgrstotales'] ) , "" );
+		$this->assertEquals( true, isset( $lista[0]['dow'] ) , "" );
+
+
+		// $q = "rollback;";
+		// try {
+			// $res = $db->query( $q );
+		// } catch ( Exception $e ) {
+			// $error = $e->getMessage() ;
+			// echo  $error;
+		// }
+		// if( $res === FALSE ) {
+			// $error = "Error: ". $db->error ;
+			// echo  $error;
+		// }
+		
+	}
+
+}
+?>

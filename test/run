@@ -1,0 +1,31 @@
+# SQL
+# testsql sql/clientes_alta.sql || exit 1
+# testsql sql/clientes_modi.sql || exit 1
+# testsql sql/clientes_baja.sql || exit 1
+# testsql sql/clientesgrupos.sql || exit 1
+# testsql sql/sp_AgendaActualizarCant1.sql || exit 1
+# testsql sql/sp_AgendaEntregaLeerPeriodoClienteProducto.sql || exit 1
+
+# classes
+testphp class/testcClientes.php || exit 1
+testphp class/testcClientesGrupos.php || exit 1
+testphp class/testcProductos.php || exit 1
+testphp class/testcAgendaEntrega.php || exit 1
+testphp class/testcReporteTirada.php || exit 1
+
+# lib 
+testphp lib/testSQL.php || exit 1
+testphp lib/testFechas.php || exit 1
+testphp lib/testSQL.php || exit 1
+
+# ajax
+# habilitar este test de nuevo,
+# falta escriribr rutinas de generacion de datos
+# testphp ajax/testAjaxDiaMod.php || exit 1
+
+# php 
+testphp php/testAgendaProduccion.php || exit 1
+testphp php/testTiradaDiaria.php || exit 1
+testphp php/testReporteProduccion.php || exit 1
+
+# testphp php/testReporteEntregaProductosAClientes.php ||exit 1

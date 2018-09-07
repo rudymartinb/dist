@@ -1,0 +1,146 @@
+<?php
+/*
+pide cliente?
+pide desde-hasta fecha
+para cada dia de la agenda
+tomar la cantidad con costo
+obtener precio segun dia
+informar: dia CCC CSC precio total
+*/
+
+require( "config.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST."/informes/facturacion/detalle_cliente_validar.php" );
+
+require_once( $DIST."/cambioprecios_soporte.php" );
+require_once( $DIST."/informes/facturacion/GenerarListaInfoFacturacionDetallada.php" );
+require_once( $DIST.$CLASS.$DEMO."/cClientesDemo.php" );
+require_once( $DIST.$CLASS.$DEMO."/cClientesGruposDemo.php" );
+require_once( $DIST.$CLASS.$DEMO."/cProductoDemo.php" );
+
+error_reporting(E_ALL);
+
+function sp_AgendaActualizarCant1( $db, $codcli, $codpro, $fecha, $cant ){
+	$q = "call sp_AgendaActualizarCant1( '".$codcli."', '".$codpro."', '".fecha2sql( $fecha )."', ".$cant." ) ";
+	try {
+		$res = $db->query( $q );
+	} catch ( Exception $e ) {
+		$error = $e->getMessage() ;
+		return $error;
+	}	
+	if( ! $res ) {
+		return $db->error;
+	}
+	return true;
+}
+
+class testInfoFacturacionDetalleClientes extends PHPUnit_Framework_TestCase {
+	public function testValidarPost(){
+		// http://distdev.elpopular:8181/informes/facturacion/detalle_cliente.php
+		// ?cli=da4fb5c6e93e74d3df8527599fa62642&desde=2014-01-01&hasta=2015-01-01
+		$post = [];
+		$cli = "da4fb5c6e93e74d3df8527599fa62642"; // 120
+		$desde = "2014-01-01";
+		$hasta = "2015-01-01";
+		
+		$post['cli'] = $cli;
+		$post['desde'] = $desde;
+		$post['hasta'] = $hasta;
+		
+		$this->assertTrue( InfoFactDetalleCli_ValidarPost( $post ), "ValidarPost" ) ;
+		
+	}
+	
+public function testGenerarLista(){
+		$db = SQL_Conexion_Demo();
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+
+		$q = "call dev_crema;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+
+		$o = new cProductoDemo();
+		$o->db = $db;
+		// $cli->Setup( true );
+		$this->assertTrue( $o->GrabarAlta(), "GrabarAlta" ) ;
+
+		$gru = new cClientesGruposDemo();
+		$gru->db = $db;
+		$this->assertTrue( $gru->GrabarAlta(), "GrabarAlta" ) ;
+		
+		$cli = new cClientesDemo();
+		$cli->db = $db;
+		$cli->Setup( true );
+		$this->assertTrue( $cli->GrabarAlta(), "GrabarAlta" ) ;
+		$this->assertEquals( 1, QueryRecCount( $db, "select * from clientes" ), "copunt clientes  = 1" );
+	
+		$pro = $o->cod;
+		$fec = "01-11-2014";
+		$pre1 = 11;
+		$pre2 = 12;
+		$pre3 = 13;
+		$pre4 = 14;
+		$pre5 = 15;
+		$pre6 = 16;
+		$pre7 = 17;
+		
+		$this->assertEquals( true, CambioPreciosAlta( $db, $pro, $fec,$pre1,$pre2,$pre3,$pre4,$pre5,$pre6,$pre7 ) );
+
+		// $db = $this->getMock('mysqli');
+		$codpro = $pro;
+		$md5cli = md5( $cli->cod );
+		$desde = "01-01-2012";
+		$hasta = "31-01-2015";
+
+		// call sp_AgendaActualizarCant1( @codcli, @codprod, @fecha, 1000 );
+		// call sp_AgendaActualizarCant2( @codcli, @codprod, @fecha, 50 );
+		$fecha = "01-11-2014";
+		$this->assertEquals( true, sp_AgendaActualizarCant1( $db, $cli->cod, $pro, $fecha, 1000 ), "Act Cant 1" );
+		$this->assertEquals( 1, QueryRecCount( $db, "select * from agenda" ), "copunt agenda = 1" );
+		$this->assertEquals( 1, QueryRecCount( $db, "call sp_InfoFacturacion( '998' , '2012-01-01' , '2015-01-31' )" ), "copunt info = 1" );
+		// $this->assertEquals( true, sp_AgendaActualizarCant1( $db, $cli->cod, $pro, $fecha, 1000 ), "Act Cant 1" );
+
+		
+
+		$lista = GenerarListaInfoFacturacionDetalleCliente( $db, $codpro, $md5cli, $desde, $hasta );
+		$this->assertEquals( 1, count( $lista ), "cantidad de items de informe" );
+		// proage, despro, cliage, razcli, fecage, cant1, cant2, precio, total
+		// $this->assertEquals( true, isset( $lista[0]['proage'] ), "cantidad de items de informe" );
+		// $this->assertEquals( true, isset( $lista[0]['despro'] ), "cantidad de items de informe" );
+		// $this->assertEquals( true, isset( $lista[0]['cliage'] ), "cantidad de items de informe" );
+		// $this->assertEquals( true, isset( $lista[0]['razcli'] ), "cantidad de items de informe" );
+		$this->assertEquals( true, isset( $lista[0]['fecage'] ), "cantidad de items de informe" );
+		$this->assertEquals( true, isset( $lista[0]['cant1'] ), "cantidad de items de informe" );
+		$this->assertEquals( true, isset( $lista[0]['cant2'] ), "cantidad de items de informe" );
+		$this->assertEquals( true, isset( $lista[0]['precio'] ), "cantidad de items de informe" );
+		$this->assertEquals( true, isset( $lista[0]['total'] ), "cantidad de items de informe" );
+		
+		$this->assertEquals( 1000, $lista[0]['cant1'] , "cantidad de items de informe" );
+		$this->assertEquals( 16, $lista[0]['precio'] , "cantidad de items de informe" );
+		$this->assertEquals( 16000, $lista[0]['total'] , "cantidad de items de informe" );
+
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+	
+	}	
+}
+?>

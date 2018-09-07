@@ -1,0 +1,86 @@
+<?php
+require( "config.php" );
+
+require_once( $DIST.$LIB."/fechas.php" );
+
+require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
+require_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
+
+require_once( $DIST.$AJAX."/ajaxAlmanaqueDiaModi.php" );
+require_once( $DIST."/src/db/mysqldb.php" );
+require_once( $DIST."/src/db/ejecutarquery.php" );
+
+error_reporting(E_ALL);
+
+
+class AjaxDiaModiTest extends PHPUnit_Framework_TestCase {
+	
+/*    
+ * rever
+	public function testSPDeberiaValidarParametros(){
+		$db = MySQLDB();
+		
+		ejecutar_query( "start transaction;" );
+		
+		$periodo = "201406";
+		$cli = "666";
+		$prod = "777";
+		$tipo = "t1";
+		$dia = "01";
+		$cant = "00003";
+		
+		$pak = "201406001001t1s01000003";
+		$pak = $periodo.$cli.$prod.$tipo."s".$dia.$cant;
+
+		$post = [];
+		$post['href']=$pak;
+		
+		$this->assertTrue( ajaxEsValidoPak( $post )," pakValido" );
+		
+		
+		$this->assertFalse( ajaxDiaModi( null, null ), "ajaxDiaModi");
+		$this->assertFalse( ajaxDiaModi( $db, null ), "ajaxDiaModi");
+		$this->assertFalse( ajaxDiaModi( $db, $post ), "ajaxDiaModi");
+		
+		ejecutar_query( "rollback;" );
+
+	}
+*/
+	
+	public function testDeberiaRecibirAjaxYActualizarDB(){
+		$periodo = "201406";
+		$cli = "001";
+		$prod = "001";
+		$tipo = "t1";
+		$dia = "01";
+		$cant = "00003";
+		
+		$pak = "201406001001t1s01000003";
+
+		$post = [];
+		$post['href']=$pak;
+		
+		$this->assertTrue( ajaxEsValidoPak( $post )," pakValido" );
+		// $arr = ajaxAbrirPak( $post );
+		
+		// $db = SQL_Conexion();
+		$db = MySQLDB( "distdev" );
+		
+		ejecutar_query( "start transaction;" );
+		ejecutar_query( "call dev_crema;" );
+		
+		/*
+		*/
+		$this->assertFalse( ajaxDiaModi( null, null ), "ajaxDiaModi");
+		$this->assertFalse( ajaxDiaModi( $db, null ), "ajaxDiaModi");
+		$this->assertTrue( ajaxDiaModi( $db, $post ), "ajaxDiaModi");
+		
+		/* me falta validar si el dato fue ingresado.
+		*/
+		ejecutar_query( "rollback;" );
+		
+	}	
+	
+}
+
+?>

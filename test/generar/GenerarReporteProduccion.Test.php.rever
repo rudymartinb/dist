@@ -1,0 +1,156 @@
+<?php
+
+require( "config.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+require_once( $DIST.$LIB."/PadN.php" );
+
+
+
+// include_once( $DIST.$CLASS."/demo/cClientesGrupoDemo.php" );
+require_once( $DIST.$CLASS."/demo/cClientesGruposDemo.php" );
+require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
+require_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
+
+require_once( $DIST.$CLASS."/cReporteProduccion.php" );
+require_once( $DIST.$CLASS."/cReporteTirada.php" );
+require_once( $DIST."/ArmarTiradaDiaria.php" );
+
+require_once( $DIST."/ProcesarReporteProduccion.php" );
+
+error_reporting(E_ALL);
+
+class testReporteProduccion_2 extends PHPUnit\Framework\TestCase {
+
+	public function GenerarReporte1( $db, $cant ){
+		// echo "generando reporte";
+		                                                                       
+		/*  asunto crema, se supone q la base esta vacia
+		* */
+		$this->assertEquals( 0, QueryRecCount( $db, "select * from reporteproduccion1" ), "QueryRecCount reporteproduccion1" );
+		$this->assertEquals( 0, QueryRecCount( $db, "select * from reporteproduccion2" ), "QueryRecCount reporteproduccion2" );
+		
+		for( $i = 1; $i <= $cant ; $i++ ){
+			$post = array(
+			"nrotiradas"	=> "1",
+			"fecha"			=>  FechaSumarDias( "01-06-2014", $i-1 ) ,
+			"totalkgrs"		=>  "100" ,
+			"totalkgrscb"	=>  "10",
+			"obs"			=>  "OBSERVACIONES REPORTE PRODUCCION NRO ".$i ,
+			"pro"=>  "001" ,
+			"horaini1"		=>  "00:00" ,
+			"horafin1"		=>  "01:00" ,
+			"maqini1"		=>  "100" ,
+			"maqfin1"		=>  "101" ,
+			"tiradabruta1"	=>  "200" ,
+			"carga1"		=>  "50" ,
+			"desperdicio1"	=>  "20" ,
+			"tiradaneta"	=>  "180" ,  // error ??? deberia ser tiradaneta
+			"kgrs1"			=>  "100" ,
+			"pagcolor1"		=>  "3"  ,
+			"pagtotal1"		=>  "3"  ) ;
+
+			
+			// $this->assertEquals( "falta indicar tirada neta ", ProcesarReporteProduccionVerificar( $post ), "ProcesarReporteProduccion post vacio");
+			$this->assertEquals( true, ProcesarReporteProduccion( $db, $post ), "ProcesarReporteProduccion post datos validos");
+
+		}
+		$this->assertEquals( $cant, QueryRecCount( $db, "select * from reporteproduccion1" ), "QueryRecCount reporteproduccion1" );
+		$this->assertEquals( $cant, QueryRecCount( $db, "select * from reporteproduccion2" ), "QueryRecCount reporteproduccion2" );		
+		
+
+		
+	}
+	
+
+	//~ public function testFuncionListaReportes(){
+		//~ $db = SQL_Conexion();
+		//~ $q = "call dev_crema;";
+		//~ try {
+			//~ $res = $db->query( $q );
+		//~ } catch ( Exception $e ) {
+			//~ $error = $e->getMessage() ;
+			//~ echo  $error;
+		//~ }
+		//~ if( $res === FALSE ) {
+			//~ $error = "Error: ". $db->error ;
+			//~ echo  $error;
+		//~ }
+		
+		//~ $prod = new cProducto();
+		//~ $prod->db = $db;
+
+		//~ $cod = "001" ;
+		//~ $des = "DIARIO" ;
+		//~ $abr = "DIARIO" ;
+		//~ $lun = false ;
+		//~ $mar = false ;
+		//~ $mie = false ;
+		//~ $jue = false ;
+		//~ $vie = false ;
+		//~ $sab = false ;
+		//~ $dom = false ;
+		//~ $precio = 5 ;
+		//~ $controlpapelusado = false ;
+
+		//~ $prod->cod = $cod ;
+		//~ $prod->des = $des ;
+		//~ $prod->abr = $abr ;
+		//~ $prod->lun = $lun ;
+		//~ $prod->mar = $mar ;
+		//~ $prod->mie = $mie ;
+		//~ $prod->jue = $jue ;
+		//~ $prod->vie = $vie ;
+		//~ $prod->sab = $sab ;
+		//~ $prod->dom = $dom ;
+		//~ $prod->automatico = true;
+		//~ $prod->precio = $precio ;
+		//~ $prod->controlpapelusado = $controlpapelusado ;
+		
+
+		//~ $this->assertTrue( $prod->GrabarAlta( ), "Producto GrabarAlta ". $prod->DetalleError );
+
+		
+		//~ $this->GenerarReporte1( $db,100 );
+		
+		//~ /* ok, pero lo que me interesa hasta ahora es
+		//~ poder generar una lista de reportes
+		//~ tomando como base fecha inicial y final.
+		//~ el metodo de esta clase de prueba usa 01-06-14 como dia inicial
+		//~ */
+		
+		//~ // caso 1: sin datos para obtener
+		//~ $fecini = "01-06-2013";
+		//~ $fecfin = "30-06-2013";
+		//~ $arr = ObtenerListaReportesProduccion( $db, $fecini, $fecfin );
+		//~ $this->assertEquals( 0, count($arr), "ObtenerListaReportesProduccion caso 1: sin datos");
+
+		//~ // caso 2: tenemos 10 datos
+		//~ $fecini = "01-06-2014";
+		//~ $fecfin = "30-06-2014";
+		//~ $arr = ObtenerListaReportesProduccion( $db, $fecini, $fecfin );
+		//~ $this->assertEquals( true, count($arr)>0, "ObtenerListaReportesProduccion caso 2: con datos");
+				
+		//~ /* y ahora que?
+		//~ quiero armar una tabla html.
+		//~ */
+		
+		
+
+		//~ $q = "commit;";
+		//~ try {
+			//~ $res = $db->query( $q );
+		//~ } catch ( Exception $e ) {
+			//~ $error = $e->getMessage() ;
+			//~ echo  $error;
+		//~ }
+		//~ if( $res === FALSE ) {
+			//~ $error = "Error: ". $db->error ;
+			//~ echo  $error;
+		//~ }
+		
+	//~ }
+	
+}
+
+?>

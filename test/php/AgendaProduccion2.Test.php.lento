@@ -1,0 +1,74 @@
+<?php
+
+require( "config.php" );
+// include_once( $DIST.$CLASS."/cNuevaAgenda.php" );
+require_once( $DIST."/GenerarListaCantidades.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+
+error_reporting(E_ALL);
+class testAgendaProduccion2 extends PHPUnit\Framework\TestCase {
+
+	public function testNuevaAgenda(){
+		$cli = "120";
+		$prod = "001";
+		$periodo = "201411";
+		$db = SQL_Conexion();
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+
+		$lista = GenerarListaCantidades( $db, $cli, $prod, $periodo );
+		$this->assertEquals( 30, count( $lista ) );
+		// var_dump( $lista );
+		
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+		
+		
+	}
+
+
+/*
+	public function testNuevaAgenda(){
+		$cli = "120";
+		$prod = "001";
+		$periodo = "201411";
+		$db = SQL_Conexion();
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+
+		$lista = GenerarListaCantidades( $db, $cli, $prod, $periodo );
+		$this->assertEquals( 30, count( $lista ) );
+		var_dump( $lista );
+
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+		
+		
+	}
+*/	
+}
+?>

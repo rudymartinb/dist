@@ -1,0 +1,1 @@
+clear ; phantomjs /develop/runqunit.js http://distdev.elpopular:8181/test/js/testRegistrarDevolucionAjax.js.php

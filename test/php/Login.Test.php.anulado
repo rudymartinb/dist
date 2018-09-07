@@ -1,0 +1,54 @@
+<?php
+require ("config.php");
+// include_once ($DIST.$CLASS."/cReporteProduccion.php");
+// include_once ($DIST.$CLASS."/cReporteTirada.php");
+error_reporting(E_ALL);
+function Login( $db, $user = "", $pwd = "" ){
+	if( $db === null ){ return false; }
+	if( $user == "" ){ return false; }
+	if( $pwd  == "" ){ return false; }
+	
+	$q = "call login( '".$user."'.'".$pwd."' ) ";
+	$res = $db->query( $q );
+	if( ! $res ){
+		return false;
+	}
+	$result = false;
+	if( $obj = $res->fetch_object() ){
+		$result = $obj->result;
+		// return $result;
+	}
+	
+	return $result;
+}
+class testLogin extends PHPUnit_Framework_TestCase {
+	public function testBasico(){
+		$db = $this->getMock('mysqli');
+
+		$obj = new stdClass();
+		$obj->result = true;
+		
+		$res = $this->getMockBuilder('mysqli_result')
+			->disableOriginalConstructor()
+			->getMock();
+
+		$res->expects( $this->at(0) )
+			->method('fetch_object')
+			->will( $this->returnValue($obj) );
+		
+		
+		// db->query
+		$db->expects($this->at(0))
+			->method('query')
+			->will($this->returnValue($res));
+
+		
+		$user = "root";
+		$pwd = "sunpei42";
+		
+		$this->assertFalse( Login( $db, "", "" ) , "" );
+		$this->assertTrue( Login( $db, $user, $pwd ) , "" );
+	}
+	
+}
+?>

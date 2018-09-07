@@ -1,0 +1,90 @@
+<?php
+
+/* 
+lo que tengo q probar
+la clase mysqli a ver como funciona
+
+hacer pruebas reales contra un server real
+*/
+error_reporting(E_ALL);
+
+class testMockMySQLi extends PHPUnit_Framework_TestCase {
+
+	public function testSQL(){
+		$db = SQL_Conexion();
+		$this->assertTrue( ( gettype( $db ) == "object" )  );
+		$this->assertTrue( strpos( get_class(  $db  ), "mysqli" ) >= 0, "STRPOS" );
+		$this->assertTrue(  SQL_EsValido( $db ) );
+	
+	}
+
+	/* prueba de select directo sin tabla alguna
+	*/
+	public function test1SelectOK(){
+
+		$arr['uno'] = "sarasa estuvo aqui";
+		
+		$res = $this->getMockBuilder('mysqli_result')
+			 ->disableOriginalConstructor()
+			 ->getMock();
+			 
+		$res->expects($this->any())
+		->method('fetch_assoc')
+		->will($this->returnValue($arr));
+				
+		$mysqli = $this->getMock('mysqli');
+		// $mysqli->connect_errno = true;
+		// $mysqli->connect_error = "SARASA ESTUVO AQUI";
+
+
+		$mysqli->expects($this->once())
+		->method('query')
+		->will($this->returnValue($res));
+		
+ 		
+		$this->assertEquals( true ,  strpos( get_class(  $mysqli  ), "mysqli" ) > 0  );
+		
+		// se supone que la "conexión" real fue establecida previamente
+		// y que todo esto esta metido dentro de un metodo o funcion
+		
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("SELECT 'sarasa estuvo aqui' as uno");
+		if( $res ){
+			$row = $res->fetch_assoc();
+		}
+		$this->assertEquals( $row['uno'] , "sarasa estuvo aqui" );
+		$this->assertEquals( false, $mysqli->more_results() );
+		$res->close();
+		
+		
+	}
+	
+	public function test1SelectError(){
+		// $mysqli = new mysqli("127.0.0.1", "root", "sunpei42", "testing");
+		$mysqli = $this->getMock('mysqli');
+		
+		// $mysqli->expects($this->any())
+		// ->method('__get')
+		// ->with($this->equalTo('error'))
+		// ->will($this->returnValue("Table 'testing.sarasa' doesn't exist" ));
+
+		$mysqli->expects($this->once())
+		->method('query')
+		->will($this->returnValue(false));
+
+		if ($mysqli->connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli->connect_error;
+			return false;
+		}
+
+		$res = $mysqli->query("SELECT * from sarasa");
+		$this->assertEquals( false , $res );
+		// $this->assertEquals( $mysqli->error, "Table 'testing.sarasa' doesn't exist" );
+		$this->assertEquals( false, $mysqli->more_results() );
+	}
+}
+?>

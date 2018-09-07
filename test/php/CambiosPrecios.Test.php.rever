@@ -1,0 +1,183 @@
+<?php
+// TODO ESTO HABRIA QUE CAMBIARLO POR MOCKS DE MYSQLI
+
+/*
+necesito una opcion donde se indique
+producto
+fecha
+y traiga la lista existente de cambios de precios
+permite agregar y borrar
+
+quiero estrenar el achoice que hice para la agenda.
+
+*/
+
+require( "config.php" );
+// include_once( $DIST.$CLASS."/cNuevaAgenda.php" );
+// include_once( $DIST."/GenerarListaCantidades.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST."/cambioprecios_soporte.php" );
+
+error_reporting(E_ALL);
+
+
+class CambiosPreciosTest extends PHPUnit_Framework_TestCase {
+
+	public function testAltaCambio(){
+		$db = SQL_Conexion_Demo();
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+
+	
+		$pro = "001";
+		$fec = "01-11-2014";
+		$pre1 = 11;
+		$pre2 = 12;
+		$pre3 = 13;
+		$pre4 = 14;
+		$pre5 = 15;
+		$pre6 = 16;
+		$pre7 = 17;
+		
+		// $regcambio = new cRegistroCambioPrecio();
+		// $regcambio->db = $db; 
+		// $regcambio->codpro = $pro;
+		// $regcambio->fecha = $fec;
+		// $regcambio->pre1 = $pre1;
+		// $regcambio->pre2 = $pre2;
+		// $regcambio->pre3 = $pre3;
+		// $regcambio->pre4 = $pre4;
+		// $regcambio->pre5 = $pre5;
+		// $regcambio->pre6 = $pre6;
+		// $regcambio->pre7 = $pre7;
+		
+		$this->assertEquals( true, CambioPreciosAlta( $db, $pro, $fec,$pre1,$pre2,$pre3,$pre4,$pre5,$pre6,$pre7 ) );
+		// teoricamente solo queda registrado un precio
+		$this->assertEquals( true, CambioPreciosAlta( $db, $pro, $fec,$pre1,$pre2,$pre3,$pre4,$pre5,$pre6,$pre7 ) );
+
+		$fec = "10-11-2014";
+		$pre1 = 12;
+		$pre2 = 13;
+		$pre3 = 14;
+		$pre4 = 15;
+		$pre5 = 16;
+		$pre6 = 17;
+		$pre7 = 18;
+		
+		$this->assertEquals( true, CambioPreciosAlta( $db, $pro, $fec,$pre1,$pre2,$pre3,$pre4,$pre5,$pre6,$pre7 ) );
+
+		$fec = "17-11-2014";
+		$pre1 = 13;
+		$pre2 = 14;
+		$pre3 = 15;
+		$pre4 = 16;
+		$pre5 = 17;
+		$pre6 = 18;
+		$pre7 = 19;
+		
+		$this->assertEquals( true, CambioPreciosAlta( $db, $pro, $fec,$pre1,$pre2,$pre3,$pre4,$pre5,$pre6,$pre7 ) );
+		
+		/* comprobar precios
+		*/
+		
+		$fecha = "05-11-2014";
+		$this->assertEquals( 13, DeterminarPrecio( $db, $pro, $fecha ), "Determinar precio" );
+		$fecha = "12-11-2014";
+		$this->assertEquals( 14, DeterminarPrecio( $db, $pro, $fecha ), "Determinar precio" );
+		$fecha = "19-11-2014";
+		$this->assertEquals( 15, DeterminarPrecio( $db, $pro, $fecha ), "Determinar precio" );
+
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+		
+		
+	}
+	
+	public function testAltaCambioPost(){
+		$pro = "001";
+		$fec = "01-11-2014";
+		$pre1 = 11;
+		$pre2 = 12;
+		$pre3 = 13;
+		$pre4 = 14;
+		$pre5 = 15;
+		$pre6 = 16;
+		$pre7 = 17;
+		
+		$post = [];
+		$post['codpro'] = $pro;
+		$post['fecha'] = $fec;
+		$post['pre1'] = $pre1;
+		$post['pre2'] = $pre2;
+		$post['pre3'] = $pre3;
+		$post['pre4'] = $pre4;
+		$post['pre5'] = $pre5;
+		$post['pre6'] = $pre6;
+		$post['pre7'] = $pre7;
+		
+		$this->assertEquals( true, CambioPrecioValidarPost( $post ), " Validar Post Cambio Precio" );
+		// $this->assertEquals( true, CambioPrecioValidarPost( $post ), " Validar Post Cambio Precio" );
+	
+	}
+	
+	public function testListaCambios(){
+		$db = SQL_Conexion_Demo();
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+
+	
+		$pro = "001";
+		$fec = "01-11-2014";
+		$pre1 = 11;
+		$pre2 = 12;
+		$pre3 = 13;
+		$pre4 = 14;
+		$pre5 = 15;
+		$pre6 = 16;
+		$pre7 = 17;
+		
+		
+		$this->assertEquals( true, CambioPreciosAlta( $db, $pro, $fec,$pre1,$pre2,$pre3,$pre4,$pre5,$pre6,$pre7 ) );
+		$this->assertEquals( true, CambioPreciosAlta( $db, $pro, $fec,$pre1,$pre2,$pre3,$pre4,$pre5,$pre6,$pre7 ) );
+		
+		$lista = ListaCambiosPrecios( $db, $pro  );
+		$this->assertEquals( 1, count( $lista ) );
+		
+		$this->assertEquals( $pro, $lista[0]['propre'] );
+		$this->assertEquals( $fec, sql2fecha( $lista[0]['desdepre'] ) );
+		
+
+
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+		
+	
+	}
+	
+}
+?>

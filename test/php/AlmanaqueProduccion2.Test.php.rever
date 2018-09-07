@@ -1,0 +1,104 @@
+<?php
+
+require( "config.php" );
+
+require_once( $DIST."/GenerarListaCantidades.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+
+// include_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
+// include_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
+
+// include_once( $DIST.$AJAX."/ajaxAlmanaqueDiaModi.php" );
+
+error_reporting(E_ALL);
+class AlmanaqueProduccionTest extends PHPUnit_Framework_TestCase {
+	public function testDeberiaPrepararDatos(){
+		$db = SQL_Conexion();
+		
+		$q = "start transaction;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+		if( $res === FALSE ) {
+			$error = "Error: ". $db->error ;
+			echo  $error;
+			return;
+		}
+		
+		/*
+		el codigo vendra de un form
+		en dicho form los parametros seran
+		
+		periodo
+		cliente
+		producto
+		
+		en base a eso hay que armar un arreglo que contenga 
+		los dias y las cantidades para cada dia
+		*/
+		$post = [];
+		// echo $post['sarasa'];
+		
+		$this->assertFalse(  GenerarListaCant_EsValido( null ) ,  "esvalido null" );
+		$this->assertFalse(  GenerarListaCant_EsValido( "" ) ,  "esvalido vacio" );
+		$this->assertFalse(  GenerarListaCant_EsValido( [] ) ,  "esvalido arr vacio" );
+		$this->assertFalse(  GenerarListaCant_EsValido( ['sarasa'] ) ,  "esvalido arr invalido" );
+		
+		$periodo = "201410";
+		$cli = "001";
+		$prod = "001";
+		$post = [];
+		$post['cli'] = $cli;
+		$post['prod'] = $prod;
+		$post['periodo'] = $periodo;
+		
+		$this->assertTrue(  GenerarListaCant_EsValido( $post ) ,  "post valido" );
+
+		$lista = ObtenerListaDias( $db, $post );
+		// var_dump( $lista );
+		
+		$this->assertEquals(  1, count( $lista ) ,  "cantidad dias de la lista" );		
+		
+		$lista = GenerarListaCantidades( $db, $cli, $prod, $periodo );
+
+		$cantdias = CantidadDias( $periodo );
+		// var_dump( $lista );
+		$this->assertEquals(  $cantdias, count( $lista ) ,  "cantidad dias de la lista" );
+		
+		/* el problema es que la cantidad de elementos no tiene pq
+		ser mayor que uno.
+		*/
+		
+		/* ok. ya tengo la lista.
+		
+		*/
+		
+		
+		
+		
+		$q = "rollback;";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$error = $e->getMessage() ;
+			echo  $error;
+			return;
+		}
+		if( $res === FALSE ) {
+			$error = "Error: ". $db->error ;
+			echo  $error;
+			return;
+		}
+	
+		
+	}
+
+
+}
+
+?>

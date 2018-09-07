@@ -1,0 +1,51 @@
+<?php
+
+include_once( "config.php" );
+include_once( $DIST.$LIB."/SQL.php" );
+include_once( $DIST.$CLASS."/cNroDoc.php" );
+error_reporting(E_ALL);
+class testcNroDoc2 extends PHPUnit_Framework_TestCase {
+	public function testLeer(){
+		$db = SQL_Conexion();
+		$q = "start transaction;";
+		$res = $db->query( $q );
+
+		$q = "call dev_crema;";
+		$res = $db->query( $q );
+		
+		$prefijo = "0001";
+		$despre = "TALONARIO 1";
+		
+		$obj = new cNroDoc();
+		$obj->db = $db;
+		$obj->prefijo = $prefijo;
+		$obj->despre = $despre;
+
+		$this->assertTrue( $obj->GrabarAlta(), "GrabarAlta" );
+		$obj->despre = "";
+		$this->assertTrue( $obj->Leer(), "GrabarAlta" );
+		
+		$arr = $obj->LeerNros();
+		$this->assertEquals( 0, count( $arr ), "LeerNros" );
+		
+		$q = "call sp_tipdoc_alta('11',''FACTA');";
+		$res = $db->query( $q );
+		
+		$this->assertTrue( $obj->UpdateNro(100,"11"), "GrabarAlta" );
+		
+		
+		/* armar una lista cruzada de talonarios y nros de documentos
+		si no existe un nro, sale con cero
+		*/
+		$arr = $obj->LeerNros();
+		$this->assertEquals( 1, count( $arr ), "LeerNros" );
+		$this->assertEquals( $arr[0]['codtd'], "11", "LeerNros" );
+		$this->assertEquals( $arr[0]['prox'], 100, "LeerNros" );
+		
+		
+		
+		$q = "rollback;";
+		$res = $db->query( $q );		
+	}
+}
+?>

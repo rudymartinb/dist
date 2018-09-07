@@ -1,0 +1,35 @@
+<?php
+require_once ("config.php");
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$CLASS."/pdfRemito.php" );
+
+error_reporting(E_ALL); 
+
+class testRemitoPDF extends PHPUnit\Framework\TestCase {
+
+	/* recibo un idx, poblar los datos restantes
+	*/
+	public function testForm(){
+		$post = [];
+		$post['idx'] = 44;
+		
+		$pdf = new PDFRemito();
+		
+		$db = SQL_Conexion();	
+		$pdf->db = $db;
+		
+		// $want = QueryRecCount( $db, "select * from remitos1;" )+1;
+		// $this->assertEquals( 0, $want );
+		
+		$idx = $post['idx'];
+
+		$this->assertTrue( $pdf->LeerRemito( $idx ) );
+		$this->assertEquals( count( $pdf->datos ) , 1 );
+		
+		
+		// $pdf->Generar( );
+
+		
+	}
+}
+?>

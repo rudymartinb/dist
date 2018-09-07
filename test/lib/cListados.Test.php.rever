@@ -1,0 +1,24 @@
+<?php
+require( "config.php" );
+require_once ($DIST.$LIB."/cListado.php");
+// include_once ($DIST.$CLASS."/cReporteTirada.php");
+
+error_reporting(E_ALL);
+
+class testReporteProduccion_nose extends PHPUnit_Framework_TestCase {
+	public function test1(){
+	
+		$lista2 = new cListado();
+		$this->assertEquals( 0, count( $lista2->cols ), "cant cols" );
+		
+		$this->assertEquals( true, $lista2->AddCol( "Cod", 100, "" ) ,"" );
+		$this->assertEquals( true, $lista2->AddCol( "Apellido y Nombre", 400, "" ) ,"" );
+		$this->assertEquals( true, $lista2->AddCol( "Telefono", 200, "" ) ,"" );
+		$this->assertEquals( true, $lista2->AddCol( "Saldo", 200, "text-align:right;" ) ,"" );
+		$this->assertEquals( 4, count( $lista2->cols ), "cant cols" ) ;
+		
+		// $this->assertEquals( , count( $lista2->cols ), "cant cols" ) ;
+		
+	}
+}
+?>

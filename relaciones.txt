@@ -1,0 +1,30 @@
+codigos fuentes actualmente en uso y/o relacionados
+
+raiz considerada: base de projecto
+
+index.php
+
+config.php
+clientes_alta.php
+clientes_modi.php
+clientes_cons.php
+productos_alta.php
+productos_modi.php
+productos_cons.php
+cambioprecios.php
+/src/agendaproduccion/AgendaProduccion.php
+tiradadiaria.php
+reporteproduccion.php
+reporteproduccionconsulta.php
+reporteproduccionEliminar.php
+/informes/facturacion/detallado.php
+/informes/facturacion/detallado_nc.php
+/informes/mensual/index.php
+/informes/mensualxp/index.php
+clientesgrupos_alta.php
+clientesgrupos_modi.php
+
+lib/SQL.php
+class/cClientes.php
+
+		

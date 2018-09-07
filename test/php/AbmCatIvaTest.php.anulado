@@ -1,0 +1,38 @@
+<?php
+require_once( "/home/mantener/projects/dist/config.php" );
+// require_once ("config.php");
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$CLASS."/cCatIva.php" );
+// include_once( $DIST.$CLASS."/pdfRemito.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+
+error_reporting(E_ALL);
+
+class testAbmCatIva extends PHPUnit_Framework_TestCase {
+
+	/* recibo un idx, poblar los datos restantes
+	*/
+	public function test1(){
+		
+		$db = SQL_Conexion();	
+		$q = "start transaction;";
+		$db->query( $q );
+		
+		$post = [];
+		$post['codiva'] = '1';
+		$post['desiva'] = 'RESPONSABLE INSCRIPTO';
+		$post['abriva'] = 'RES.INS.';
+		$post['aliiva'] = '21';
+		$post['reciva'] = '10.5';
+		$post['tipiva'] = 'A';
+		
+		$cai = new cCatIva();
+		$this->assertTrue( $cai->DesglosarForm( $post ) );
+		$this->assertTrue( $cai>GrabarAlta( $idx ) );
+		$this->assertEquals( count( $pdf->datos ) , 1 );
+		
+		$q = "rollback;";
+		$db->query( $q );		
+	}
+}
+?>

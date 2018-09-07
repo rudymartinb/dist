@@ -1,0 +1,2 @@
+#!/bin/bash
+clear ; phantomjs /develop/runqunit.js http://distdev.elpopular:8181/test/html/testHTML.php 

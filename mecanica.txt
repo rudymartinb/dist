@@ -1,0 +1,75 @@
+11:23 22/04/2014
+ok.
+
+Alta de Orden de Produccion
+
+pide fecha
+pide productos a utilizar (tilde)
+para cada producto presenta una pantalla con los clientes
+pide cantidad para cada cliente
+
+generar pantalla de orden de produccion
+dia
+lista de productos y cantidades totales ?
+genera numero de orden
+
+Baja de Orden de Produccion
+pide numero
+muestra datos de orden
+eliminar
+
+12:48 23/06/2014
+teworicamente ya tengo la Agenda de expectativa de produccion
+ahora la idea es generar la orden.
+
+la orden lleva:
+
+dia 
+lista clientes
+cantiades, con costo, sin costo.
+
+modificar la orden implica modificar la agenda?
+
+pantalla para imprimir 
+
+campo observaciones?
+
+que papeles se mandan al momento de dar una orden de produccion?
+
+tiene que elegir que clientes imprimir ??
+
+--
+12:05 Martes, 24 de Junio de 2014
+agregar campo de grupo en clientes
+
+17:10 Jueves, 18 de Diciembre de 2014
+demasiado tiempo perdido con esto
+
+calcular inutilizable:
+para todas las tiradas mayores a 8 paginas
+tomar el desperdicio + la carga
+
+circulacion neta = tirada neta reporte produccion
+no distribuido = tirada bruta - devolucion - tirada neta reportre producccion
+
+cambiar de nobmre columna circulacion neta paga
+
+tirada bruta = neta + inutilizado
+
+
+2018 03 06
+puede que varios de los comentarios anteriores no sean validos, dado que en nov 2014 hubo una revision terrible con kolman
+
+despues de mucho tiempo intento retomar el sistema. 
+
+en principio hay problemas:
+1) no tiene seguridad (gravisimo)
+2) el codigo no quedo bien estructurado 
+3) hay una muy alta dependencia entre compenentes
+4) variables publicas
+5) variables publicas dentro d elas clases de objetos
+
+6) hay partes del codigo que fueron pensadas para incoporar en distribudora pero que no funcionan y que deberian ser removidas.
+
+2018 09 04
+armado documentacion sobre cada codigo fuente y veo que hace cada cosa

@@ -1,0 +1,87 @@
+<?php
+require( "/home/mantener/projects/dist/config.php" );
+// require_once( "/home/mantener/projects/dist/config.php" );
+// $DIST = "/home/mantener/projects/dist";
+require_once( $DIST."/informes/mensualxp/InformeMensual2Post.php" );
+require_once( $DIST."/informes/mensualxp/SQL_InformeMensual2.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+
+error_reporting(E_ALL);
+
+class InfoMensual2Test extends PHPUnit_Framework_TestCase {
+	public function testPostVacio(){
+	   $post = null; 
+	   $this->assertFalse( InformeMensual2ValidarPost( $post ) ); 
+	}
+	
+	public function testPostVacio2(){
+	   $post = []; 
+	   $this->assertFalse( InformeMensual2ValidarPost( $post ) ); 
+	}
+	
+	public function testPost(){
+	   $post = []; 
+	   $post['perini'] = '201412'; 
+	   $post['perfin'] = '201501'; 
+	   $this->assertTrue( InformeMensual2ValidarPost( $post ) ); 
+	}
+
+	public function testProcesarPost(){
+	   $post = []; 
+	   $post['perini'] = '201412'; 
+	   $post['perfin'] = '201501';
+      $db = SQL_Conexion_Demo( ); 
+	   $this->assertTrue( count( InformeMensual2Post( $db, $post ) ) == 2 ); 
+	}
+
+	
+	public function testListaNull(){
+	   $lista = SQL_InformeMensual2( null, null, null );
+	   $this->assertTrue( $lista == null );
+	}
+	public function testListaVacia(){
+	   $db = SQL_Conexion_Demo( );
+	   $perini = "201401";
+	   $perfin = "201401";
+	   $lista = SQL_InformeMensual2( $db, $perini, $perfin );
+	   $this->assertEquals( 0, count( $lista )  );
+	}
+
+	public function testLista1Periodo(){
+	   $db = SQL_Conexion_Demo( );
+	   $perini = "201412";
+	   $perfin = "201412";
+	   $lista = SQL_InformeMensual2( $db, $perini, $perfin );
+	   $this->assertEquals( 1, count( $lista ) );
+	}
+	
+	/* esta prueba depende de los datos del SQL
+	*/
+	public function testLista1Periodo201412(){
+	   $db = SQL_Conexion_Demo( );
+	   $perini = "201412";
+	   $perfin = "201412";
+	   $lista = SQL_InformeMensual2( $db, $perini, $perfin );
+	   $this->assertEquals( "201412", $lista[0]['periodo'] );
+	   $this->assertEquals( 118899, $lista[0]['cirnetatotal'] );
+	   
+	}
+	public function testLista1Periodo301412201501(){
+	   $db = SQL_Conexion_Demo( );
+	   $perini = "201412";
+	   $perfin = "201501";
+	   $lista = SQL_InformeMensual2( $db, $perini, $perfin );
+
+	   $this->assertEquals( "201412", $lista[0]['periodo'] );
+	   $this->assertEquals( 118899, $lista[0]['cirnetatotal'] );
+	   $this->assertEquals( "201501", $lista[1]['periodo'] );
+	   $this->assertEquals( 41122, $lista[1]['cirnetatotal'] );
+	   
+      $this->assertEquals( 2, count( $lista ) );
+	   
+	}
+
+
+}
+?>

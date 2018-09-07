@@ -1,0 +1,156 @@
+<?php
+require( "config.php" );
+require_once( $DIST.$CLASS.$DEMO."/cFakeDB.php" );
+require_once( $DIST."/src/db/mysqldb.php" );
+error_reporting(E_ALL);
+
+class testcFakeDB extends PHPUnit_Framework_TestCase {
+	
+	public function testFakeDB_EjecutarQuery(){
+		$fakedb = new cFakeDB();
+		$registro = [];
+		$registro['campo1'] = "1";
+		$registro['campo2'] = "2";
+		$registro['campo3'] = "3";
+		
+		$q = "comando 1";
+		$fakedb->EsperarQuery( $q, $registro );		
+		
+		
+		$db = new cMySQL( "dist", $fakedb );
+		
+		$q = "comando 1";
+		$arr = $db->ejecutar( $q );
+		
+		$this->assertNotNull( $arr );
+		$this->assertEquals( "1", $arr["campo1"]  );
+		$this->assertEquals( "2", $arr["campo2"]  );
+		$this->assertEquals( "3", $arr["campo3"]  );
+	}
+
+	
+	public function testDB_Fetch_Object(){
+		$db = new cFakeDB();
+
+		$registro = [];
+		$registro['campo1'] = "1";
+		$registro['campo2'] = "2";
+		$registro['campo3'] = "3";
+		
+		$arr = [];
+		$arr[] = $registro;
+		// var_dump( $arr );		
+		
+		$q = "comando 1";
+		$db->EsperarQuery( $q, $arr );
+		
+		$res = $db->query( $q );
+		
+		// $res es un objeto !
+		$this->assertTrue( $res != false );
+		
+
+		$obj = $res->fetch_object();
+		// var_dump( $obj );
+		$this->assertEquals( "1", $obj->campo1  );
+		$this->assertEquals( "2", $obj->campo2  );
+		$this->assertEquals( "3", $obj->campo3  );
+		
+		$db->next_result();
+		$this->assertFalse(  $db->more_results() );
+		
+	}
+	
+	public function testDB_Fetch_Array(){
+		$db = new cFakeDB();
+
+		$registro = [];
+		$registro['campo1'] = "1";
+		$registro['campo2'] = "2";
+		$registro['campo3'] = "3";
+		
+		$arr = [];
+		$arr[] = $registro;
+		// var_dump( $arr );		
+		
+		$q = "comando 1";
+		$db->EsperarQuery( $q, $arr );
+		
+		$res = $db->query( $q );
+		
+		$this->assertFalse(  $db->more_results() );
+		// $res es un objeto !
+		$this->assertTrue( $res != false );
+		
+
+		$obj = $res->fetch_array();
+		// var_dump( $obj );
+		$this->assertEquals( "1", $obj["campo1"]  );
+		$this->assertEquals( "2", $obj["campo2"]  );
+		$this->assertEquals( "3", $obj["campo3"]  );
+		
+		$db->next_result();
+		$this->assertFalse(  $db->more_results() );
+		
+	}	
+
+	// fetch array en varios tramos
+	public function testDB_QueryNoRet(){
+		$db = new cFakeDB();
+		$arr = [  ];
+		$arr[] = [ 1 ];
+		$arr[] = [ 2 ];
+		$arr[] = [ 3 ];
+		$arr[] = [ 4 ];
+		
+		$this->assertTrue( count( $arr ) == 4 );
+		unset( $arr[2] );
+		$this->assertEquals( $arr[0][0] , 1 );
+		$this->assertEquals( $arr[1][0] , 2 );
+		$this->assertEquals( $arr[3][0] , 4 );
+		$this->assertTrue( count( $arr ) == 3 );
+		
+		$q = "comando 1";
+		$db->EsperarQuery( $q, $arr );
+		
+		$res = $db->query( $q );
+		$this->assertTrue( $res != false );
+		$this->assertFalse( $db->more_results() );
+		
+		// $this->assertTrue( $db->more_results() );
+		
+		$obj = $res->fetch_array();
+		// var_dump( $obj );
+		$this->assertEquals( $obj[0] , 1 );
+		$this->assertFalse( $db->more_results() );
+		
+		$obj = $res->fetch_array();
+		$this->assertEquals( $obj[0] , 2 );
+		$this->assertFalse( $db->more_results() );
+		
+		$obj = $res->fetch_array();
+		$this->assertEquals( $obj[0] , 4 );
+		// var_dump( $res );
+		$this->assertFalse( $db->more_results() );
+		
+		// $this->assertEquals( $obj[1][0] , 2 );
+		// $this->assertTrue( count( $obj ) == 3 );
+		
+		// if(  ){
+			// $result = $obj->result ;
+		// }
+		// while ( $db->more_results() ){
+			// $db->next_result();
+
+		
+
+	}
+
+	// public function test_Row_Count(){
+		// $db = SQL_Conexion();
+		// $this->assertEquals( -1, QueryRecCount( $db, "" ), "QueryRecCount Fallo" );
+	// }
+
+}
+
+?>

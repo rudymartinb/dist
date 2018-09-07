@@ -1,0 +1,349 @@
+<?php
+
+require( "config.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+
+require_once( $DIST."/ArmarTiradaDiaria.php" );
+
+// include_once( $DIST.$CLASS."/demo/cClientesGrupoDemo.php" );
+require_once( $DIST.$CLASS."/demo/cClientesGruposDemo.php" );
+require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
+require_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
+
+error_reporting(E_ALL);
+class testTiradaDiaria extends PHPUnit\Framework\TestCase {
+	
+	public function testTiradaDiaria1(){
+		$db = MySQLDB();
+		
+		ejecutar_query( "start transaction;" );				
+		ejecutar_query( "call dev_crema;" );
+		
+		$codcli = 1;
+		for( $g = 0; $g < 4; $g++ ){
+			$gru = new cClientesGruposDemo();
+			$gru->db = $db;
+			$gru->cod = PadN( $g , 3 );
+			$gru->des = "GRUPO ".PadN( $g , 3 );
+			$gru->abr = "GRUPO ".PadN( $g , 3 );
+			$gru->GrabarAlta();
+			$this->assertTrue( $gru->GrabarAlta(), "GrabarAlta : ". $gru->DetalleError ) ;
+
+			for( $i = 0; $i < 5; $i++ ){
+				$cli = new cClientesDemo();
+				$cli->db = $db;
+				$cli->grupo = $gru->cod;
+				$cli->cod = PadN( $codcli, 3 );
+				$cli->raz = "CLIENTE ".PadN( $codcli, 3 );
+				$codcli ++;
+
+				$this->assertTrue( $cli->GrabarAlta() , "GrabarAlta : " ) ;
+			}			
+		}
+		
+		/* 
+		okay. ahora me falta generar productos.
+		por ahora usamos uno solo. 
+		depsues vemos.
+		*/
+		$prod = new cProducto();
+		$prod->db = $db;
+
+		$cod = "001" ;
+		$des = "DIARIO LUNES" ;
+		$abr = "E.LUNES" ;
+		$lun = true ;
+		$mar = false ;
+		$mie = false ;
+		$jue = false ;
+		$vie = false ;
+		$sab = false ;
+		$dom = false ;
+		$precio = 5 ;
+		$controlpapelusado = true ;
+
+		$prod->cod = $cod ;
+		$prod->des = $des ;
+		$prod->abr = $abr ;
+		$prod->lun = $lun ;
+		$prod->mar = $mar ;
+		$prod->mie = $mie ;
+		$prod->jue = $jue ;
+		$prod->vie = $vie ;
+		$prod->sab = $sab ;
+		$prod->dom = $dom ;
+		$prod->automatico = true;
+		$prod->precio = $precio ;
+		$prod->controlpapelusado = $controlpapelusado ;
+
+		$this->assertTrue( $prod->GrabarAlta( ), "Producto GrabarAlta ". $prod->DetalleError );
+
+		/* 
+		okay. ahora me falta generar productos.
+		por ahora usamos uno solo. 
+		depsues vemos.
+		*/
+		$prod = new cProducto();
+		$prod->db = $db;
+
+		$cod = "002" ;
+		$des = "OTRO PRODUCTO" ;
+		$abr = "OTRO" ;
+		$lun = true ;
+		$mar = false ;
+		$mie = false ;
+		$jue = false ;
+		$vie = false ;
+		$sab = false ;
+		$dom = false ;
+		$precio = 5 ;
+		$controlpapelusado = true ;
+
+		$prod->cod = $cod ;
+		$prod->des = $des ;
+		$prod->abr = $abr ;
+		$prod->lun = $lun ;
+		$prod->mar = $mar ;
+		$prod->mie = $mie ;
+		$prod->jue = $jue ;
+		$prod->vie = $vie ;
+		$prod->sab = $sab ;
+		$prod->dom = $dom ;
+		$prod->automatico = true;
+		$prod->precio = $precio ;
+		$prod->controlpapelusado = $controlpapelusado ;
+
+		$this->assertTrue( $prod->GrabarAlta( ), "Producto GrabarAlta ". $prod->DetalleError );
+				
+		/* 
+		okay.
+		ahora quiero, para cada uno de los clientes generados,
+		asignar cantidades para un dia determinado.
+		
+		todo esto lo hacemos sobre un dia X
+		*/
+		$codcli = 1;
+		$fecha = "06-06-2014";
+		
+		for( $codcli = 1; $codcli <= 20; $codcli ++){
+			$cant = rand( 10, 5000);
+			$this->DiaModi1( $db, $fecha, PadN($codcli,3), "001", $cant );
+			$cant = rand( 10, 100);
+			$this->DiaModi2( $db, $fecha, PadN($codcli,3), "001", $cant );
+		}
+		for( $codcli = 1; $codcli <= 20; $codcli ++){
+			$cant = rand( 10, 5000);
+			$this->DiaModi1( $db, $fecha, PadN($codcli,3), "002", $cant );
+			$cant = rand( 10, 100);
+			$this->DiaModi2( $db, $fecha, PadN($codcli,3), "002", $cant );
+		}
+		
+		
+		/* 
+		ahora bien.
+		en este punto me interesa generar una funcion de php o algo
+		que me devuelva lo anterior.
+		
+		los datos basicos que necesito son
+		producto 
+		grupo (para ir armando subtotales)
+		cliente
+		cantidad
+		
+		la presentacion tiene que ser una pagina por producto
+		*/
+		
+		$arr = ArmarTiradaDiaria( $db, "2014-06-06" );
+		// var_dump( $arr );
+		$this->assertTrue( count( $arr ) == 40, "cantidad registros " );
+		ejecutar_query( "rollback;" );				
+		
+	}
+
+
+	function DiaModi1( $db, $fec, $cli, $prod, $cant ){
+		if( ! SQL_EsValido( $db ) ){
+			return false;
+		}
+		// if( ! ajaxEsValidoPak( $post ) ) {
+			// return false;
+		// }
+		// $arr = ajaxAbrirPak( $post );
+		// $tipo = $arr['tipo'];
+		// $periodo = $arr['periodo'];
+		// $cli = $arr['cli'];
+		// $prod = $arr['prod'];
+		// $cant = $arr['cant'];
+		// $dia = $arr['dia'];
+		
+		// armar fecha.
+		// $ano = substr( $periodo, 0, 4 );
+		// $mes = substr( $periodo, 4, 2 );
+		// $fecha = fecha2SQL( $dia."-".$mes."-".$ano ) ;
+		$fecha = fecha2SQL( $fec ) ;
+
+		// if( $tipo == "t1" ){
+			$q = "call sp_AgendaActualizarCant1(";
+		// } else {
+			// $q = "call sp_AgendaActualizarCant2(";
+		// }
+		$q .= "'". $cli ."'," ;
+		$q .= "'". $prod ."'," ;
+		$q .= "'". $fecha ."'," ;
+		$q .= "'". $cant ."')" ;
+		
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$DetalleError = $e->getMessage() ;
+			echo $DetalleError;
+			return false;
+		}
+		if( $res === FALSE ) {
+			$DetalleError = "Error : ". $db->error ;
+			echo $DetalleError;
+			return false;
+		}
+		
+		$q = "call dev_last_result()";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$DetalleError = $e->getMessage() ;
+			echo $DetalleError;
+			return false;
+		}
+		if( $res === FALSE ) {
+			$DetalleError = "Error: ". $db->error ;
+			echo $DetalleError;
+			return false;
+		}
+		$result = false;
+		if( $res ) {
+			while( $obj = $res->fetch_object() ){
+				// echo gettype( $obj->result );
+				if( $obj->result == 1 ){
+					$result = true ;
+				}
+			}
+			while ( $db->more_results() ){
+				$db->next_result();
+			}
+		}	
+		
+		return $result;
+	}
+
+	function DiaModi2( $db, $fec, $cli, $prod, $cant ){
+		if( ! SQL_EsValido( $db ) ){
+			return false;
+		}
+		// if( ! ajaxEsValidoPak( $post ) ) {
+			// return false;
+		// }
+		// $arr = ajaxAbrirPak( $post );
+		// $tipo = $arr['tipo'];
+		// $periodo = $arr['periodo'];
+		// $cli = $arr['cli'];
+		// $prod = $arr['prod'];
+		// $cant = $arr['cant'];
+		// $dia = $arr['dia'];
+		
+		// armar fecha.
+		// $ano = substr( $periodo, 0, 4 );
+		// $mes = substr( $periodo, 4, 2 );
+		// $fecha = fecha2SQL( $dia."-".$mes."-".$ano ) ;
+		$fecha = fecha2SQL( $fec ) ;
+
+		// if( $tipo == "t1" ){
+			// $q = "call sp_AgendaActualizarCant1(";
+		// } else {
+			$q = "call sp_AgendaActualizarCant2(";
+		// }
+		$q .= "'". $cli ."'," ;
+		$q .= "'". $prod ."'," ;
+		$q .= "'". $fecha ."'," ;
+		$q .= "'". $cant ."')" ;
+		
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$DetalleError = $e->getMessage() ;
+			echo $DetalleError;
+			return false;
+		}
+		if( $res === FALSE ) {
+			$DetalleError = "Error : ". $db->error ;
+			echo $DetalleError;
+			return false;
+		}
+		
+		$q = "call dev_last_result()";
+		try {
+			$res = $db->query( $q );
+		} catch ( Exception $e ) {
+			$DetalleError = $e->getMessage() ;
+			echo $DetalleError;
+			return false;
+		}
+		if( $res === FALSE ) {
+			$DetalleError = "Error: ". $db->error ;
+			echo $DetalleError;
+			return false;
+		}
+		$result = false;
+		if( $res ) {
+			while( $obj = $res->fetch_object() ){
+				// echo gettype( $obj->result );
+				if( $obj->result == 1 ){
+					$result = true ;
+				}
+			}
+			while ( $db->more_results() ){
+				$db->next_result();
+			}
+		}	
+		
+		return $result;
+	}	
+
+	
+}
+
+// function TiradaDiaria( $db, $fec ){
+
+	// $q = "call sp_TiradaDiaria( '$fec' )";
+	// try {
+		// $res = $db->query( $q );
+	// } catch ( Exception $e ) {
+		// $DetalleError = $e->getMessage() ;
+		// echo $DetalleError;
+		// return false;
+	// }
+	// if( $res === FALSE ) {
+		// $DetalleError = "Error: ". $db->error ;
+		// echo $DetalleError;
+		// return false;
+	// }
+	// $arr = [];
+	// if( $db->more_results() ) {
+		// while( $obj = $res->fetch_object() ){
+			// $v = [];
+			// $v['proage'] = $obj->proage; 
+			// $v['despro'] = $obj->despro; 
+			// $v['grucli'] = $obj->grucli; 
+			// $v['desgru'] = $obj->desgru; 
+			// $v['cliage'] = $obj->cliage; 
+			// $v['razcli'] = $obj->razcli; 
+			// $v['cant1'] = $obj->cant1; 
+			// $v['cant2'] = $obj->cant2;
+			// $arr[] = $v;
+		// }
+		// while ( $db->more_results() ){
+			// $db->next_result();
+		// }
+	// }		
+	// return $arr;
+// }
+?>

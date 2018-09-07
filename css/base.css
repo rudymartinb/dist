@@ -1,0 +1,221 @@
+#abuscar{
+font-family:courier new;
+font-weight:bold;
+text-align:left;
+font-size:18px;
+color:white;
+background-color:darkorange;
+padding:1px;
+border:0px;
+width:100%;
+}
+
+.abuscar{
+font-family:courier new;
+font-weight:bold;
+text-align:left;
+font-size:18px;
+color:white;
+background-color:darkorange;
+padding:1px;
+border:0px;
+float:left;
+width:100%;
+}
+
+
+#base {
+	background-color:lightgray; 
+	position:absolute; 
+	left:10px;
+	top:10px; 
+	padding:5px
+}
+#borde1 {
+	border-style:double;
+	border-width:1px; 
+	left:15px;
+	top:15px; 
+	padding:1px;
+}
+#sombra {
+	background-color:darkblue; 
+	position:absolute; 
+	left:30px;
+	top:30px; 
+	padding:5px
+}
+
+#contenidocaja {
+border-style:double;
+border-width:1px; 
+padding:2px;
+margin:1px;
+}
+#mensajetexto{
+font-family:courier new;
+font-weight:bold;
+text-align:center;
+font-size:18px;
+color:darkcyan; 
+overflow:hidden;
+max-height:18px;
+}
+.nombre{
+	
+}
+.telefono{
+	
+}
+.detallecontacto{
+	overflow:hidden;
+	float:left;
+}
+
+.achoice1{ 
+	color:black; 
+	background-color:lightgray; 
+	float:left; 
+	width:50%;
+	overflow:hidden;
+	max-height:18px;
+	}
+
+.achoice1seleccion{ 
+	color:white; 
+	background-color:#FF00FF; 
+	float:left; 
+	width:100%; 
+	float:left; 
+	width:50%;
+	overflow:hidden; 
+	max-height:18px;
+	}
+
+
+.titact{
+	color:darkcyan;
+	font-family:courier new;
+	font-weight:bold;
+	font-size:18px;
+	float:left;
+	overflow:hidden; 
+	background-color:lightgray;
+}
+
+.titina{
+	color:black;
+	font-family:courier new;
+	font-weight:bold;
+	font-size:18px;
+	float:left;
+	overflow:hidden; 
+	background-color:lightgray;
+}
+
+.acboton1{
+margin-left:auto;
+margin-right:none;
+float:left;
+width:50%;
+}
+.acboton2{
+margin-left:none;
+margin-right:auto;
+float:left;
+width:50%;
+}
+
+.alertAC{
+color:black;
+border-style:none;
+border-color:white;
+border-width:1px;
+background-color:lightgray;
+
+font-family:courier new;
+font-weight:bold;
+font-size:18px;
+}
+
+.verdeBB{
+color:white;
+background-color:green;
+border-style:none;
+border-color:white;
+border-width:1px;
+font-family:courier new;
+font-weight:bold;
+font-size:18px;
+}
+
+
+.dato {
+}
+
+.cNormal{
+	color:black;
+	font-family:courier new;
+	font-weight:bold;
+	font-size:18px;
+	float:left;
+	overflow:hidden; 
+	background-color:lightgray;
+}
+
+.cget {
+color:white;
+border-style:solid;
+border-color:black;
+border-width:1px;
+background-color:darkorange;
+
+font-family:courier new;
+font-weight:bold;
+font-size:18px;
+}
+
+.cget1 {
+color:white;
+border-style:solid;
+border-color:lightgray;
+border-width:1px;
+background-color:gray;
+
+font-family:courier new;
+font-weight:bold;
+font-size:18px;
+}
+
+.tituloslistacontactos1 {
+	font-family:courier new;
+	font-weight:bold;
+	text-align:left;
+	font-size:18px;
+	color:darkviolet;
+	overflow:none;
+	padding:1px;
+	max-height:18px;
+}
+
+
+#tituloslistacontactos1 {
+	font-family:courier new;
+	font-weight:bold;
+	text-align:left;
+	font-size:18px;
+	color:darkviolet;
+	overflow:none;
+	padding:1px;
+	max-height:18px;
+}
+
+#listacontactos {
+	font-family:courier new;
+	font-weight:bold;
+	text-align:left;
+	font-size:18px;
+	color:black;
+	overflow:none;	
+	max-height:18px;
+}

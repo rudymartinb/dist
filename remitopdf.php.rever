@@ -1,0 +1,18 @@
+<?php
+include_once( "config.php" );
+include_once( $DIST.$LIB."/fpdf/fpdf.php" );
+include_once( $DIST.$LIB."/SQL.php" );
+include_once( $DIST.$CLASS."/pdfRemito.php" );
+
+$post = $_GET;
+if( count( $post ) > 0 ){
+	$idx = $post['idx'];
+	// Creación del objeto de la clase heredada
+	$pdf = new PDFRemito();
+	$db = SQL_Conexion();	
+	$pdf->db = $db;
+	$pdf->LeerRemito( $idx );
+	$pdf->Generar( );
+}
+
+?>

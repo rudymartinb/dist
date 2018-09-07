@@ -1,0 +1,15 @@
+-- Start a transaction.
+BEGIN;
+use distdev;
+
+call tap.no_plan();
+
+set @ini := "201502";
+set @fin := "201602";
+
+call sp_InformeMensualxP( @ini, @fin );
+  
+select tap.eq( @cuenta, 13, "12 meses");
+ 
+CALL tap.finish();
+ROLLBACK; 

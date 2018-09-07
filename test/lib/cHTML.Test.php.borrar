@@ -1,0 +1,123 @@
+<?php
+require( "config.php" );
+require_once( $DIST.$LIB."/cHTML.php" );
+error_reporting(E_ALL);
+
+class testOrden extends PHPUnit_Framework_TestCase {
+	
+	public function test1(){
+		$p = new cHTML();
+		
+		$doctype = "<!DOCTYPE html>";
+		$esp = $doctype;
+		$esp .= "<html>";
+		$esp .= "<head>";
+		// $esp .= "<title>".$p->head->titulo;
+		// $esp .= "</title>";			
+		$esp .= "</head>";
+		$esp .= "<body>";
+		$esp .= "</body>";
+		$esp .= "</html>";
+		
+		$res = $p->Render();
+		
+		$this->assertEquals( $esp, $res, "titulo vacio" );
+		$p->head->titulo = "Titulo Pagina";
+		
+		$esp = $doctype;
+		$esp .= "<html>";
+		$esp .= "<head>";
+		$esp .= "<title>".$p->head->titulo;
+		$esp .= "</title>";		
+		$esp .= "</head>";
+		$esp .= "<body>";
+		$esp .= "</body>";
+		$esp .= "</html>";
+		
+		$res = $p->Render();
+		
+		$this->assertEquals( $esp, $res, "vacio" );
+		$esp = $doctype;
+		$esp .= "<html>";
+		$esp .= "<head>";
+		$esp .= "<title>".$p->head->titulo;
+		$esp .= "</title>";		
+		$esp .= "<link href='/css/base.css' rel='stylesheet' type='text/css' />";		
+		$esp .= "</head>";
+		$esp .= "<body>";
+		$esp .= "</body>";
+		$esp .= "</html>";
+		
+		$p->head->AddCSS( "/css/base.css" );
+		
+		$res = $p->Render();
+		
+		$this->assertEquals( $esp, $res, "vacio" );
+
+		$esp = $doctype;
+		$esp .= "<html>";
+		$esp .= "<head>";
+		$esp .= "<title>".$p->head->titulo;
+		$esp .= "</title>";		
+		$esp .= "<link href='/css/base.css' rel='stylesheet' type='text/css' />";		
+		$esp .= "<script type='text/javascript' href='/js/focus.js' ></script>";
+		$esp .= "</head>";
+		$esp .= "<body>";
+		$esp .= "</body>";
+		$esp .= "</html>";
+		
+		$p->head->AddJS( "/js/focus.js" );
+		
+		
+		$res = $p->Render();
+		
+		$this->assertEquals( $esp, $res, "vacio" );
+		
+		// 
+		$esp = $doctype;
+		$esp .= "<html>";
+		$esp .= "<head>";
+		$esp .= "<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'>";
+		$esp .= "<title>".$p->head->titulo;
+		$esp .= "</title>";		
+		$esp .= "<link href='/css/base.css' rel='stylesheet' type='text/css' />";		
+		$esp .= "<script type='text/javascript' href='/js/focus.js' ></script>";
+		$esp .= "</head>";
+		$esp .= "<body>";
+		$esp .= "</body>";
+		$esp .= "</html>";
+		
+		$p->head->AddMeta( "http-equiv='Content-Type' content='text/html; charset=iso-8859-1'"  );
+		
+		
+		$res = $p->Render();
+		
+		$this->assertEquals( $esp, $res, "vacio" );
+
+		$esp = $doctype;
+		$esp .= "<html>";
+		$esp .= "<head>";
+		$esp .= "<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'>";
+		$esp .= "<title>".$p->head->titulo;
+		$esp .= "</title>";		
+		$esp .= "<link href='/css/base.css' rel='stylesheet' type='text/css' />";		
+		$esp .= "<script type='text/javascript' href='/js/focus.js' ></script>";
+		$esp .= "</head>";
+		$esp .= "<body>";
+		$esp .= "<div id='div1'>";
+		$esp .= "</div>";
+		$esp .= "</body>";
+		$esp .= "</html>";
+		
+		// $p->body->id = "";
+		$p->body->AddDiv( "div1", ""  );
+		
+		$res = $p->Render();
+		
+		$this->assertEquals( $esp, $res, "vacio" );
+
+		
+		
+	}
+}
+?>

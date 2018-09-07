@@ -1,0 +1,11 @@
+<phpunit>
+  <testsuites>
+    <testsuite name="class">
+      <file>class/testcReporteTirada.php</file>
+      <file>class/testcAgendaEntrega.php</file>
+      <file>class/testcClientes.php</file>
+      <file>class/testcClientesGrupos.php</file>
+      <file>class/testcProductos.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>

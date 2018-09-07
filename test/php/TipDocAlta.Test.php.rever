@@ -1,0 +1,47 @@
+<?php
+
+require ("config.php");
+require_once( $DIST.$LIB."/SQL.php" );
+// include_once ($DIST.$CLASS."/cReporteEntregaClientes.php");
+// include_once ($DIST.$CLASS."/cReporteEntregaClientes.php");
+// include_once ($DIST.$CLASS."/cReporteTirada.php");
+error_reporting(E_ALL);
+
+function TipDocAlta( $codtd, $destd, $db ){
+	$q = "call sp_nrodoc1_agregar( '".$codtd."', '".$destd."' );";
+	$res = $db->query( $q );
+	$control = false;
+	if( $res ) {
+		$control = true;
+		while( $db->more_results() ){
+			$db->next_result();
+		}
+		// $res->close();
+	} else {
+		
+	}
+
+	// $res->close();
+	return $control;
+}
+
+class sp_tipdoc_agregar extends PHPUnit_Framework_TestCase {
+	public function testSql(){
+		$db = SQL_Conexion();	
+		$q = "start transaction;";
+		$db->query( $q );
+		
+		$codtd = "11";
+		$destd = "FACTURA A";
+		// $q = "call sp_tipdoc_agregar( '".$codtd."', '".$destd."' );";
+		// $res = $db->query( $q );
+		// echo $q;
+		$res = TipDocAlta( $codtd, $destd, $db );
+		
+		$this->assertTrue( $res, "TipDocAlta" );
+	
+		$q = "rollback;";
+		$db->query( $q );
+	}
+}
+?>

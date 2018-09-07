@@ -1,0 +1,71 @@
+<?php
+
+require( "config.php" );
+// include_once( $DIST.$CLASS."/cAlmanaque.php" );
+require_once( $DIST.$CLASS."/cOrden.php" );
+require_once( $DIST.$CLASS."/cAgendaListaDoble.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+
+require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
+require_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
+require_once( $DIST.$CLASS."/demo/cClientesGruposDemo.php" );
+
+error_reporting(E_ALL);
+
+
+class AgendaProduccionTest extends PHPUnit\Framework\TestCase {
+
+	
+	/* primera pantalla agenda 
+	donde muestra el listado de clientes,
+	productos y cantidades
+	*/
+	public function testActualizarAgenda(){
+		$db = MySQLDB();
+		
+		ejecutar_query( "start transaction;" );				
+		ejecutar_query( "call dev_crema;" );
+				
+
+		$gru = new cClientesGruposDemo();
+		$gru->db = $db;
+		$gru->GrabarAlta();
+		$this->assertTrue( $gru->GrabarAlta() == 1 , "GrabarAlta : ". $gru->DetalleError ) ;
+
+		$cli = new cClientesDemo();
+		$cli->db = $db;
+		$cli->grupo = $gru->cod;
+		
+		$this->assertEquals( true, $cli->GrabarAlta() ,"Cli GrabarAlta" );
+
+		$pro = new cProductoDemo();
+		$pro->db = $db;
+		$this->assertEquals( true, $pro->GrabarAlta() ,"pro GrabarAlta" );
+
+		$pro1 = new cProductoDemo();
+		$pro1->db = $db;
+		$pro1->cod = "990";
+		$this->assertEquals( true, $pro1->GrabarAlta() ,"pro GrabarAlta" );
+
+		$pro2 = new cProductoDemo();
+		$pro2->db = $db;
+		$pro2->cod = "991";
+		$this->assertEquals( true, $pro2->GrabarAlta() ,"pro GrabarAlta" );
+
+		
+		$web = new cAgendaListaDoble();
+		$web->db = $db;
+		$web->periodo = "201405";
+		
+		$res = $web->ArmarLista();
+		$esperado = true;
+		$this->assertEquals( $esperado, $res, "web->ArmarLista();" );
+
+		$this->assertEquals(3, count( $web->lista  ),"count" );
+		
+		ejecutar_query( "rollback;" );
+	}
+	
+}
+
+?>

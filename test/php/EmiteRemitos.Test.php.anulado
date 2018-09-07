@@ -1,0 +1,112 @@
+<?php
+require ("config.php");
+require_once( $DIST.$CLASS."/cEmitirRemitos.php" );
+// include_once( $DIST.$LIB."/SQL.php" );
+error_reporting(E_ALL);
+
+class EmitirRemitosTest extends PHPUnit_Framework_TestCase {
+	public function testArr(){
+		$arr = [];
+		$arr[] = 100;
+		$arr[] = "001";
+		$arr[] = "EDICION DIARIO EL POPULAR" ;
+		$datos[] = $arr ;
+		// var_dump(  $datos );
+
+	}
+	public function testVerificarRemitos(){
+		$db = $this->getMock('mysqli');
+		
+		/* simular la devolucion de varios remitos
+		idx, clirem1, fecrem1, nrorem1, bimrem1
+		*/
+		
+		$l = [];
+		
+		$arr=[];
+		$arr['idx'] = 11;
+		$arr['clirem1'] = "001";
+		$arr['fecrem1'] = "2014-09-01";
+		$arr['nrorem1'] = "0001-00000011";
+		$arr['bimrem1'] = "1111";
+		$l[] = $arr;
+		
+		$arr=[];
+		$arr['idx'] = 12;
+		$arr['clirem1'] = "002";
+		$arr['fecrem1'] = "2014-09-01";
+		$arr['nrorem1'] = "0001-00000012";
+		$arr['bimrem1'] = "2222";
+		$l[] = $arr;
+		
+		// mysqli_result
+		$res = $this->getMockBuilder('mysqli_result')
+			 ->disableOriginalConstructor()
+			 ->getMock();
+			 
+		$res->expects($this->at(0))
+		->method('fetch_assoc')
+		->will($this->returnValue($l[0]));
+
+		$res->expects($this->at(1))
+		->method('fetch_assoc')
+		->will($this->returnValue($l[1]));		
+
+		$res->expects($this->at(2))
+		->method('fetch_assoc')
+		->will($this->returnValue(false));		
+		
+
+		// $db->expects($this->at(1))
+		// ->method('more_results')
+		// ->will($this->returnValue(true));
+		// $db->expects($this->at(2))
+		// ->method('more_results')
+		// ->will($this->returnValue(false));
+		
+		
+		// pasamos el res a la query
+		$db->expects($this->at(0))
+		->method('query')
+		->will($this->returnValue($res));
+
+		$db->expects($this->at(0))
+		->method('more_results')
+		->will($this->returnValue(true));
+		$db->expects($this->at(1))
+		->method('next_results')
+		->will($this->returnValue(false));
+		$db->expects($this->at(1))
+		->method('more_results')
+		->will($this->returnValue(false));
+
+		
+		$obj = new cEmitirRemitos();
+		$obj->fecha = "01-09-2014";
+		$obj->db = $db;
+		$lista = $obj->ObtenerListaRemitos();
+		
+		$this->assertEquals( $obj->DetalleError, "", "DetalleError" );
+		$this->assertEquals( "array", gettype( $lista ) );
+		$row1 = $lista[0];
+		// var_dump( $row1 );
+		$this->assertEquals( $row1['idx'], 11 );
+		$this->assertEquals( $row1['clirem1'], "001" );
+		$this->assertEquals( $row1['fecrem1'], "2014-09-01" );
+		$this->assertEquals( $row1['nrorem1'], "0001-00000011" );
+		$this->assertEquals( $row1['bimrem1'], 1111 );
+
+		$row1 = $lista[1];
+		// var_dump( $row1 );
+		$this->assertEquals( $row1['idx'], 12 );
+		$this->assertEquals( $row1['clirem1'], "002" );
+		$this->assertEquals( $row1['fecrem1'], "2014-09-01" );
+		$this->assertEquals( $row1['nrorem1'], "0001-00000012" );
+		$this->assertEquals( $row1['bimrem1'], 2222 );
+	}
+	
+	// function testLeerForm(){
+	// }
+}
+
+

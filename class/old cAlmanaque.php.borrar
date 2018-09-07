@@ -1,0 +1,20 @@
+<?php
+class cAlmanaque {
+	public $periodo = "";
+	public $ano = "";
+	public $mes = "";
+	
+	public $dia1;
+	public $diasdelmes = 0;
+	public $dow1 = -1;
+	
+	public function Generar(){
+		if( $this->periodo <> "" ){
+			$this->ano = substr( $this->periodo, 0, 4 ) ;
+			$this->mes = substr( $this->periodo, 4, 2 ) ;
+		}
+		$this->dia1 = "01-".$this->mes."-".$this->ano;
+		$dia1messig = "01-".$this->mes."-".$this->ano;
+	}
+}
+?>

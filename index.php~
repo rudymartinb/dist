@@ -1,0 +1,107 @@
+<?php
+/* 
+*/
+error_reporting(E_ALL);
+include_once( "config.php" );
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<title>EL POPULAR » Menú Distribución</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style>
+#admtitulo{
+font-family:courier new;
+font-weight:bold;
+text-align:left;
+font-size:18px;
+color:black;
+padding:1px;
+border:5px;width:100%;
+}
+
+#admtitulo2{
+font-family:courier new;
+font-weight:bold;
+text-align:left;
+font-size:16px;
+color:black;
+padding:1px;
+border:5px;width:100%;
+}
+
+.admitem {
+font-family:courier new;
+font-weight:bold;
+text-align:left;
+font-size:18px;
+color:black;
+padding:1px;
+border:5px;width:100%;
+
+}
+</style>
+<link href="css/base.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="http://ww.elpopular/js/jquery-1.9.0.js"></script>
+<script type="text/javascript" >
+
+	
+	$(document).ready(function(){
+		});
+
+
+
+</script>
+</head>	
+
+<body style='background-color:white;'>
+<hr>
+<div id="admtitulo">DISTRIBUCION</div>
+
+<hr>
+<div id="admtitulo2">Tablas Basicas:</div>
+<div class="admitem"><a href='clientesgrupos_alta.php'  >Altas Grupos Clientes</a></div>
+<div class="admitem"><a href='clientesgrupos_modi.php'  >Modif. Grupos Clientes</a></div>
+<div class="admitem"><a href='talonarios_alta.php'  >Alta Talonarios</a></div>
+
+<div class="admitem"><a href='tipdoc_alta.php'  >Alta Tipos Documentos</a></div>
+
+<div class="admitem"><a href='numdoc2_modi.php'  >Numeradores de Documentos</a></div>
+
+<hr>
+<div id="admtitulo2">Clientes:</div>
+<div class="admitem"><a href='clientes_alta.php'  >Altas</a></div>
+
+<div class="admitem"><a href='clientes_modi.php'  >Modificación</a></div>
+<div class="admitem"><a href='clientes_cons.php'  >Consultar</a></div>
+
+<hr>
+<div id="admtitulo2">Productos:</div>
+<div class="admitem"><a href='productos_alta.php' >Altas</a></div>
+<div class="admitem"><a href='productos_modi.php' >Modificación</a></div>
+<div class="admitem"><a href='productos_cons.php' >Consultar</a></div>
+<div class="admitem"><a href='cambioprecios.php'  >Cambio de Precios</a></div>
+
+<hr>
+<div id="admtitulo2">Producción:</div>
+<div class="admitem"><a href='AgendaProduccion.php' 			>Agenda de Produccion</a></div>
+<div class="admitem"><a href='tiradadiaria.php' 				>Tirada Diaria</a></div>
+<div class="admitem"><a href='reporteproduccion.php'			>Reporte Producción</a></div>
+<div class="admitem"><a href='reporteproduccionconsulta.php'	>Consulta de Reporte Producción</a></div>
+<div class="admitem"><a href='reporteproduccionEliminar.php'	>Borrado de Reporte Producción</a></div>
+
+<?php 
+// <div class="admitem"><a href='emitirremitos.php'	>Emitir Remitos a Clientes</a></div>
+?>
+<hr>
+<div id="admtitulo2">Informes:</div>
+<div class="admitem"><a href='/informes/facturacion/detallado.php'	>Informe Detallado para Facturación</a></div>
+<div class="admitem"><a href='/informes/facturacion/detallado_nc.php'	>Informe Detallado Notas de Crédito</a></div>
+<div class="admitem"><a href='/informes/mensual/index.php'	>Informe Mensual</a></div>
+<div class="admitem"><a href='/informes/mensualxp/index.php'	>Informe Circulacion Neta Mensual por Periodos </a></div>
+
+
+
+</body>
+</html>
