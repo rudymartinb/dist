@@ -30,11 +30,15 @@ class cClientes extends cBasica {
 		return true;
 	
 	}
+	public function get_codigo() : string {
+		return $this->cod;
+	}
+
+	public function get_raz() : string {
+		return $this->raz;
+	}
 	
 	public function GrabarAlta(){
-		if( ! $this->EsValido() ){
-			return false;
-		}
 		
 		$this->cod = PadN( $this->cod , 3 );
 		$query = "call SP_ClientesAlta( ";
@@ -48,15 +52,12 @@ class cClientes extends cBasica {
 		$query .= "'$this->zona' ,"; 
 		$query .= "'$this->grupo' );"; 
 		
-		return ejecutar_query( $query );		
-
+		$this->db->ejecutar( $query );
+		
 	}
 
 	
 	public function GrabarModi(){
-		if( ! $this->EsValido() ){
-			return false;
-		}
 		
 		$this->cod = PadN( $this->cod , 3 );
 	
@@ -70,14 +71,16 @@ class cClientes extends cBasica {
 		$txt .= " $this->gan ,"; 
 		$txt .= "'$this->zona' ,"; 
 		$txt .= "'$this->grupo' );"; 
-		return ejecutar_query( $txt );
+		
+		$this->db->ejecutar( $txt );
+		// return ejecutar_query( $txt );
 	
 	}
 	
 		
 	public function Leer( ){
 		$q = "call SP_ClientesLeer( '$this->cod' ); ";
-		$arr = ejecutar_query( $q );		
+		$arr = $this->db->ejecutar( $q );
 		$obj = $arr[0];
 		$this->raz = $obj['razcli'];
 		$this->dom = $obj['domcli'];

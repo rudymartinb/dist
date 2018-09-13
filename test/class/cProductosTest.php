@@ -1,124 +1,90 @@
 <?php
 
+// use SebastianBergmann\CodeCoverage\Node\Builder;
+use mylib\mysql_query_mock;
+
 require_once( "config.php" );
 
-require_once( $DIST.$LIB."/SQL.php" );
+// require_once( $DIST.$LIB."/SQL.php" );
 require_once( $DIST.$CLASS."/cProducto.php" );
-require_once( $DIST.$CLASS.$DEMO."/cProductoDemo.php" );
+
 
 error_reporting(E_ALL);
 
 class cProductoTest extends PHPUnit\Framework\TestCase {
-    public function test1(){
-        $db = SQL_Conexion();
+    
+    public function testBuilder(){
         
-        $q = "start transaction;";
-        try {
-            $res = $db->query( $q );
-        } catch ( Exception $e ) {
-            $error = $e->getMessage() ;
-            echo  $error;
-        }
-        if( $res === FALSE ) {
-            $error = "Error: ". $db->error ;
-            echo  $error;
-        }
+        $prod = cProducto::Builder()->setDes("SARASA")->build();
         
-        $o = new cProductoDemo();
-        $o->db = $db;
-        // $cli->Setup( true );
-        $this->assertTrue( $o->GrabarAlta(), "GrabarAlta" ) ;
+        $this->assertTrue( $prod instanceof cProducto, "objeto debe ser cProducto" );
         
-        $q = "rollback;";
-        try {
-            $res = $db->query( $q );
-        } catch ( Exception $e ) {
-            $error = $e->getMessage() ;
-            echo  $error;
-        }
-        if( $res === FALSE ) {
-            $error = "Error: ". $db->error ;
-            echo  $error;
-        }
+        // "DIARIO LUNES" se configura en demo()
+        $this->assertEquals( "SARASA", $prod->getDes(), "objeto debe ser cProducto" );
+    }
+    
+    // 
+    
+    public function testAlta(){
+        // $db = SQL_Conexion();
+        $db = mylib\mysql_query_mock::Builder()->build();
+
+        $prod = cProducto::Builder()->setDB( $db )->setDemo()->build();
+        
+        $db->start_debug();
+        $query = "call SP_ProductoAlta( '998', 'DIARIO LUNES', 'E.LUNES', false  )";
+        $db->esperar( $query, function() {
+            $this->assertTrue( true );
+        } );
+        $prod->GrabarAlta();
+        // $this->assertTrue( , "GrabarAlta" ) ;
         
     }
-	public function testFalla(){
-		$db = SQL_Conexion();
+    
+    
+// 	public function testFalla(){
+// 		$db = SQL_Conexion();
 		
-		$q = "start transaction;";
-		try {
-			$res = $db->query( $q );
-		} catch ( Exception $e ) {
-			$error = $e->getMessage() ;
-			echo  $error;
-		}
-		if( $res === FALSE ) {
-			$error = "Error: ". $db->error ;
-			echo  $error;
-		}
+// 		$q = "start transaction;";
+// 		$res = $db->query( $q );
 
-		$q = "call dev_crema;";
-		try {
-			$res = $db->query( $q );
-		} catch ( Exception $e ) {
-			$error = $e->getMessage() ;
-			$this->assertEquals( true, false , $error);
-			return false;
-		}
-		if( $res === FALSE ) {
-			$error = "Error: ". $db->error ;
-			$this->assertEquals( true, false , $error);
-			return false;
-		}
+// 		$q = "call dev_crema;";
+// 		$res = $db->query( $q );
 		
-		$this->assertEquals( 0, QueryRecCount( $db, "select * from productos" ), "QueryRecCount productos" );
+// 		$this->assertEquals( 0, QueryRecCount( $db, "select * from productos" ), "QueryRecCount productos" );
 		
-		$prod = new cProducto();
-		$prod->db = $db;
-
-		$cod = "001" ;
-		$des = "DIARIO LUNES" ;
-		$abr = "E.LUNES" ;
-		$controlpapelusado = false ;
-
-		$prod->cod = $cod ;
-		$prod->des = $des ;
-		$prod->abr = $abr ;
-		$prod->controlpapelusado = $controlpapelusado ;
+// 		$prod = new cProducto( $db );
+//         $prod->Setup(FALSE);
+        
+// 		$cod = $prod->cod;
+// 		$des = $prod->des;
 		
 
-		$this->assertTrue( $prod->GrabarAlta( ), "Producto GrabarAlta ". $prod->DetalleError );
-		$this->assertTrue( $prod->GrabarModi( ), "Producto GrabarModi ". $prod->DetalleError );
+// 		$this->assertTrue( $prod->GrabarAlta( ), "Producto GrabarAlta ". $prod->DetalleError );
+// 		$this->assertTrue( $prod->GrabarModi( ), "Producto GrabarModi ". $prod->DetalleError );
 
-		$prod->Clear();
-		$this->assertEquals( "" , $prod->cod, "" );
-		$prod->cod = $cod ;
+// 		$prod->Clear();
+// 		$this->assertEquals( "" , $prod->cod, "" );
 		
-		$this->assertTrue( $prod->Leer( ), "Producto Leer ". $prod->DetalleError );
-		$this->assertEquals( $cod , $prod->cod, "" );
-		$this->assertEquals( $des , $prod->des, "" );
-		$this->assertTrue( $prod->GrabarModi( ), "Producto GrabarModi ". $prod->DetalleError );
-		$prod->Clear();
-		$this->assertEquals( "" , $prod->cod, "" );
-		$prod->cod = $cod ;
+// 		$prod->cod = $cod ;
+// 		$prod->Leer();
 		
-		$this->assertTrue( $prod->Leer( ), "Producto Leer ". $prod->DetalleError );
-		$this->assertEquals( $cod , $prod->cod, "" );
-		$this->assertEquals( $des , $prod->des, "" );
+// 		$this->assertEquals( $cod , $prod->cod, "" );
+// 		$this->assertEquals( $des , $prod->des, "" );
+// 		$prod->GrabarModi( );
+		
+// 		$prod->Clear();
+// 		$this->assertEquals( "" , $prod->cod, "" );
+// 		$prod->cod = $cod ;
+		
+// 		$this->assertTrue( $prod->Leer( ), "Producto Leer ". $prod->DetalleError );
+// 		$this->assertEquals( $cod , $prod->cod, "" );
+// 		$this->assertEquals( $des , $prod->des, "" );
 
-		$q = "rollback;";
-		try {
-			$res = $db->query( $q );
-		} catch ( Exception $e ) {
-			$error = $e->getMessage() ;
-			echo  $error;
-		}
-		if( $res === FALSE ) {
-			$error = "Error: ". $db->error ;
-			echo  $error;
-		}
+// 		$q = "rollback;";
+// 		$res = $db->query( $q );
 		
-	}
+// 	}
 
 
 	

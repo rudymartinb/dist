@@ -12,8 +12,8 @@ class cAgendaEntrega{
 	public $ano = 0;
 	public $cantdias = 0;
 	
-	
-	public $ini; // dia de semana dia 01 del mes en cuestion
+	// dia de semana dia 01 del mes en cuestion
+	public $ini; 
 	
 	public $dia1;
 	public $diaX; // dia inicial almanaque

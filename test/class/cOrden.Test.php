@@ -7,7 +7,7 @@ require_once( $DIST.$CLASS."/cAgendaEntrega.php" );
 require_once( $DIST.$LIB."/fechas.php" );
 
 require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
-require_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
+// require_once( $DIST.$CLASS."/demo/cProductoDemo.php" );
 
 error_reporting(E_ALL);
 

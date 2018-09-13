@@ -1,15 +1,61 @@
 <?php
-include_once( "config.php" );
-include_once( $DIST.$LIB."/SQL.php" );
-
+// require_once( "config.php" );
+// require_once( $DIST.$LIB."/SQL.php" );
+/*
+ * problema: extraer dependiencia al $db 
+ */
 class cProducto {
-	public $cod = "";
-	public $des = "";
-	public $abr = "";
-	public $controlpapelusado = "";
+    protected $cod = "";
+    protected  $des = "";
+    protected  $abr = "";
+    protected  $controlpapelusado = "";
+    protected  $db;
+    
+	private $DetalleError;
 	
-	public $db;
-	public $DetalleError;
+	public function getDes()  {
+	    return $this->des;
+	}
+	
+	protected function __construct( ) {
+	    // $this->db = $db;
+	 
+	}
+	
+	public static function Builder(){
+	    return new class extends cProducto {
+	        public function setDB( $db ){
+	           $this->db = $db;
+	           return $this;
+	        }
+	        
+	        public function setDes( $des ){
+	           $this->des = $des;
+	           return $this;
+	        }
+	        
+	        public function setDemo(){
+	            $this->cod = "998" ;
+	            $this->des = "DIARIO LUNES";
+	            $this->abr = "E.LUNES";
+	            $this->controlpapelusado = false;
+	            return $this;
+	        }
+	        
+	        public function build(){
+	            $prod = new cProducto( null );
+	            // var_dump( $this );
+	            $prod->cod = $this->cod;
+	            $prod->des = $this->des;
+	            $prod->abr = $this->abr;
+	            $prod->controlpapelusado = $this->controlpapelusado;
+	            $prod->db = $this->db;
+	            return $prod;
+	        }
+	    };
+	}
+	
+
 	
 	public function __set($name, $value){
 	}
@@ -30,10 +76,7 @@ class cProducto {
 	}
 	
 	public function GrabarAlta(){
-		if( ! $this->EsValido() ){
-			return false;
-		}
-		
+
 		$this->cod = PadN( $this->cod , 3 );
 
 		if( $this->controlpapelusado ){ 
@@ -44,29 +87,9 @@ class cProducto {
 		
 		$txt = "call SP_ProductoAlta( '$this->cod', '$this->des', '$this->abr', $ctrl  )";
 		
-		try {
-			$res = $this->db->query( $txt );
-		} catch(Exception $e) {
-			$this->DetalleError = $e->getMessage();
-			return false;
-		}
-		if( $this->db->errno <> 0 ){
-			$this->DetalleError = "Error " . $this->db->error ;
-			return false;
-		}
-		if( $res ) {
-			if( $obj = $res->fetch_object() ){
-				$quepaso = $obj->resultado;
-				while ( $this->db->more_results() ){
-					$this->db->next_result();
-				}
-				$this->DetalleError = $this->db->error; 
-				if( $quepaso ) {
-					return true;
-				}
-			}
-		}
-		return false;
+		$res = $this->db->ejecutar( $txt );
+		
+		// return false;
 	}
 
 	

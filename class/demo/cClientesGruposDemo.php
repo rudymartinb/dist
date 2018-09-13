@@ -8,9 +8,6 @@ class cClientesGruposDemo extends cClientesGrupos{
 		$this->des = "GRUPO997";
 		$this->abr = "GRP997";
 	}
-	public function Setup( $azar = false ){
-
-	}
 }
 
 ?>

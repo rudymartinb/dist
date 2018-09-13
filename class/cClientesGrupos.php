@@ -44,18 +44,20 @@ class cClientesGrupos {
 		$txt .= "'$this->des',";
 		$txt .= "'$this->abr' );"; 
 		
-		try {
-			$res = $this->db->query( $txt );
-		} catch(Exception $e) {
-			$this->DetalleError = $e->getMessage();
-			return false;
-		}
-		if( $this->db->errno <> 0 ){
-			$this->DetalleError = "Error " . $this->db->error ;
-			return false;
-		}
-		$this->DetalleError = $txt;
-		return true;
+		$this->db->ejecutar( $txt );
+		
+		//~ try {
+			//~ $res = $this->db->query( $txt );
+		//~ } catch(Exception $e) {
+			//~ $this->DetalleError = $e->getMessage();
+			//~ return false;
+		//~ }
+		//~ if( $this->db->errno <> 0 ){
+			//~ $this->DetalleError = "Error " . $this->db->error ;
+			//~ return false;
+		//~ }
+		//~ $this->DetalleError = $txt;
+		//~ return true;
 	}
 
 	

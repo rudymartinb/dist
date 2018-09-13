@@ -7,11 +7,11 @@
 */
 
 
-include_once( "config.php" );
-include_once( $DIST.$LIB."/SQL.php" );
-include_once( $DIST.$LIB."/fechas.php" );
-include_once( $DIST.$LIB."/cHTML.php" );
-include_once( $DIST.$CLASS."/cEmitirRemitos.php" );
+require_once( "config.php" );
+require_once( $DIST.$LIB."/SQL.php" );
+require_once( $DIST.$LIB."/fechas.php" );
+require_once( $DIST.$LIB."/cHTML.php" );
+require_once( $DIST.$CLASS."/cEmitirRemitos.php" );
 
 error_reporting(E_ALL);
 
