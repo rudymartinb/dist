@@ -1,4 +1,5 @@
 <?php
+use mylib\mysql_query_mock;
 
 require_once( "config.php" );
 // include_once( $DIST.$CLASS."/cAlmanaque.php" );
@@ -25,20 +26,7 @@ class testOrden extends PHPUnit\Framework\TestCase {
 		
 // 	}
 	public function testOK(){
-		$db = SQL_Conexion();
-		
-		$q = "start transaction;";
-		try {
-			$res = $db->query( $q );
-		} catch ( Exception $e ) {
-			$error = $e->getMessage() ;
-			echo  $error;
-		}
-		if( $res === FALSE ) {
-			$error = "Error: ". $db->error ;
-			echo  $error;
-		}
-		
+	    $db = mysql_query_mock::Builder()->build();
 		
 		
 		
@@ -46,7 +34,7 @@ class testOrden extends PHPUnit\Framework\TestCase {
 		$c->db = $db;
 		$this->assertEquals( true, $c->GrabarAlta(), "ClienteDemo GrabarAlta" );
 
-		$pr = new cProductoDemo();
+		$pr = cProducto::Builder()->setDB( $db )->setDemo()->build();
 		$pr->db = $db;
 		$this->assertEquals( true, $pr->GrabarAlta(), "PrudctoDemo GrabarAlta" );
 		

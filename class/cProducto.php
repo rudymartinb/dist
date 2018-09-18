@@ -6,10 +6,10 @@
  */
 class cProducto {
     protected $cod = "";
-    protected  $des = "";
-    protected  $abr = "";
-    protected  $controlpapelusado = "";
-    protected  $db;
+    protected $des = "";
+    protected $abr = "";
+    protected $controlpapelusado = "";
+    protected $db;
     
 	private $DetalleError;
 	
@@ -29,11 +29,23 @@ class cProducto {
 	           return $this;
 	        }
 	        
-	        public function setDes( $des ){
+	        public function setCod( string $valor ){
+	            $this->cod = $valor;
+	            return $this;
+	        }
+	        
+	        public function setDes( string $des ){
 	           $this->des = $des;
 	           return $this;
 	        }
-	        
+	        public function setAbr( string $valor) {
+	            $this->abr = $valor;
+	            return $this;
+	        }
+	        public function setCtrl( bool $valor ){
+	            $this->controlpapelusado = $valor;
+	            return $this;
+	        }
 	        public function setDemo(){
 	            $this->cod = "998" ;
 	            $this->des = "DIARIO LUNES";

@@ -1,4 +1,5 @@
 <?php
+use mylib\mysql_query_mock;
 
 // require( "config.php" );
 // include_once( $DIST.$CLASS."/cAlmanaque.php" );
@@ -14,36 +15,12 @@ error_reporting( E_ALL );
  
 class AgendaProduccionTest extends PHPUnit\Framework\TestCase {
 	public function testAgenda(){ 
-		$db = SQL_Conexion();
+	    
+	    $db = mysql_query_mock::Builder()->build();
+	    
+	    
+		// $db = SQL_Conexion();
 		
-		$q = "start transaction;";
-		try {
-			$res = $db->query( $q );
-		} catch ( Exception $e ) {
-			$error = $e->getMessage() ;
-			echo  $error;
-			return;
-		}
-		if( $res === FALSE ) {
-			$error = "Error: ". $db->error ;
-			echo  $error;
-			return;
-		}
-		
-		$q = "call dev_crema();";
-		try {
-			$res = $db->query( $q );
-		} catch ( Exception $e ) {
-			$error = $e->getMessage() ;
-			echo  $error;
-			return;
-		}
-		if( $res === FALSE ) {
-			$error = "Error: ". $db->error ;
-			echo  $error;
-			return;
-		}		
-
 		$gru = new cClientesGruposDemo();
 		$gru->db = $db;
 		$gru->GrabarAlta();
@@ -54,16 +31,17 @@ class AgendaProduccionTest extends PHPUnit\Framework\TestCase {
 		$cli->gru = $gru->cod;
 		$this->assertEquals(true, $cli->GrabarAlta() ,"Cli GrabarAlta".$cli->DetalleError );
 
-		$pro = new cProductoDemo();
+		$pro = cProducto::Builder()->setDB( $db )->setDemo()->build();
+		// $pro = new cProductoDemo();
 		$pro->db = $db;
 		$this->assertEquals(true, $pro->GrabarAlta() ,"pro GrabarAlta" );
 
-		$pro1 = new cProductoDemo();
+		$pro1 = cProducto::Builder()->setDB( $db )->setDemo()->build();
 		$pro1->db = $db;
 		$pro1->cod = "990";
 		$this->assertEquals(true, $pro1->GrabarAlta() ,"pro GrabarAlta" );
 
-		$pro2 = new cProductoDemo();
+		$pro2 = cProducto::Builder()->setDB( $db )->setDemo()->build();
 		$pro2->db = $db;
 		$pro2->cod = "991";
 		$this->assertEquals(true, $pro2->GrabarAlta() ,"pro GrabarAlta" );
@@ -82,19 +60,7 @@ class AgendaProduccionTest extends PHPUnit\Framework\TestCase {
 		$this->assertEquals(true,  $agenda->procesar(), "Procesar Agenda" );
 		
 		
-		$q = "rollback;";
-		try {
-			$res = $db->query( $q );
-		} catch ( Exception $e ) {
-			$error = $e->getMessage() ;
-			echo  $error;
-			return;
-		}
-		if( $res === FALSE ) {
-			$error = "Error: ". $db->error ;
-			echo  $error;
-			return;
-		}
+
 		
 		
 	

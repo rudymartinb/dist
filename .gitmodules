@@ -1,0 +1,3 @@
+[submodule "src/myphplib"]
+	path = src/lib/myphplib
+	url = https://github.com/rudymartinb/myphplib

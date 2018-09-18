@@ -3,10 +3,10 @@
 // use SebastianBergmann\CodeCoverage\Node\Builder;
 use mylib\mysql_query_mock;
 
-require_once( "config.php" );
+// require_once( "config.php" );
 
 // require_once( $DIST.$LIB."/SQL.php" );
-require_once( $DIST.$CLASS."/cProducto.php" );
+// require_once( $DIST.$CLASS."/cProducto.php" );
 
 
 error_reporting(E_ALL);
@@ -16,7 +16,7 @@ class cProductoTest extends PHPUnit\Framework\TestCase {
     public function testBuilder(){
         
         $prod = cProducto::Builder()->setDes("SARASA")->build();
-        
+         
         $this->assertTrue( $prod instanceof cProducto, "objeto debe ser cProducto" );
         
         // "DIARIO LUNES" se configura en demo()
@@ -27,12 +27,19 @@ class cProductoTest extends PHPUnit\Framework\TestCase {
     
     public function testAlta(){
         // $db = SQL_Conexion();
-        $db = mylib\mysql_query_mock::Builder()->build();
+        $db = mysql_query_mock::Builder()->build();
 
-        $prod = cProducto::Builder()->setDB( $db )->setDemo()->build();
+        $prod = cProducto::Builder()
+        ->setDB( $db )
+        ->setCod("997")
+        ->setDes("PROD TEST")
+        ->setAbr("PT")
+        ->setCtrl( false )
+        ->build();
         
-        $db->start_debug();
-        $query = "call SP_ProductoAlta( '998', 'DIARIO LUNES', 'E.LUNES', false  )";
+        // $db->start_debug(); 
+        $query = "call SP_ProductoAlta( '997', 'PROD TEST', 'PT', false  )";
+            
         $db->esperar( $query, function() {
             $this->assertTrue( true );
         } );

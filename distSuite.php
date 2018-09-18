@@ -1,7 +1,9 @@
 <?php
+global $DIST, $CLASS;
+
 require_once 'config.php';
-require_once( $DIST."/../myphplib/db/mysql_interface.php" );
-require_once( $DIST."/../myphplib/db/mysql_query_mock.php" );
+require_once( "src/lib/myphplib/db/mysql_interface.php" );
+require_once( "src/lib/myphplib/db/mysql_query_mock.php" );
 
 
 require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
@@ -9,7 +11,8 @@ require_once( $DIST.$CLASS."/demo/cClientesDemo.php" );
 
 require_once 'test/class/cClientes.Test.php';
 require_once 'test/class/cClientesGruposTest.php';
- 
+
+require_once( $DIST.$CLASS."/cProducto.php" );
 require_once 'test/class/cProductosTest.php';
 
 
